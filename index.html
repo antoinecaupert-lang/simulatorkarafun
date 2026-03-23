@@ -456,20 +456,20 @@
       } catch(e) { cmp = null; }
     }
 
-    // 2. Analyse IA
+    // 2. Analyse IA via Vercel Function
     document.getElementById('load-msg').textContent = 'Génération de l\'analyse IA…';
     var cmpCtx = cmp ? '\n- Ville : ' + cmp.city + '\n- Concurrents détectés (' + Math.round(radius/1000) + 'km) : ' + cmp.count + '\n- Note moy. concurrents : ' + cmp.avgRating + '/5\n- Niveau concurrence : ' + lvl(cmp.count).label : '';
     var prompt = 'Tu es un expert en business karaoké pour Karafun Business. Génère une analyse personnalisée courte (4-5 paragraphes) en français pour ' + name + ', porteur d\'un projet de ' + r.nb + ' box(es) karaoké.\n\nDonnées :\n- Investissement : ' + fmt(r.invest) + '\n- CA mensuel : ' + fmt(r.revM) + '\n- Charges : ' + fmt(r.charges) + '\n- Résultat net/mois : ' + fmt(r.net) + '\n- ROI annuel : ' + r.roi.toFixed(1) + '%\n- Retour invest. : ' + (isFinite(r.pbk) && r.pbk > 0 ? r.pbkY.toFixed(1) + ' ans' : 'modèle à revoir') + '\n- Stade : ' + stage + cmpCtx + '\n\nTon : professionnel, chaleureux, direct. Pas de liste à puces. Uniquement du texte.';
 
     var analysis = null;
     try {
-      var aiRes = await fetch('https://api.anthropic.com/v1/messages', {
+      var aiRes = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: [{ role: 'user', content: prompt }] })
+        body: JSON.stringify({ prompt: prompt })
       });
       var aiData = await aiRes.json();
-      analysis = aiData.content && aiData.content[0] ? aiData.content[0].text : null;
+      analysis = aiData.analysis || null;
     } catch(e) { analysis = null; }
 
     // 3. Envoi Formspree
