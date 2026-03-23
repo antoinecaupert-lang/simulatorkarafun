@@ -219,7 +219,7 @@ footer a{color:rgba(232,68,122,.5);text-decoration:none}
 <footer>&copy; 2025 Karafun Business &mdash; <a href="https://business.karafun.com/fr/" target="_blank">business.karafun.com</a></footer>
 
 <script>
-var FORMSPREE_ID = 'xvzwjerk';
+var FORMSPREE_ID = 'VOTRE_ID_FORMSPREE';
 var cur = 1;
 
 document.getElementById('nb').oninput = function() {
@@ -290,8 +290,11 @@ function showResults(r, name, email, mkt, analysis) {
   var h = '<div style="padding:0 0 8px;">';
   h += '<div style="text-align:center;padding:20px 28px 8px;">';
   h += '<div class="okico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#5DE8A6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
-  h += '<div style="font-family:\'Playfair Display\',serif;font-size:19px;font-weight:700;margin-bottom:5px;">Analyse prete, ' + fn + ' !</div>';
-  h += '<div style="font-size:12px;color:var(--muted);">Rapport envoye a <strong style="color:var(--accent);">' + email + '</strong></div>';
+  var qColor = qualification === 'Lead chaud' ? '#5DE8A6' : qualification === 'Lead tiede' ? '#FFD166' : '#FF6B6B';
+  var qEmoji = qualification === 'Lead chaud' ? 'Projet tres prometteur' : qualification === 'Lead tiede' ? 'Projet a potentiel' : 'Projet a consolider';
+  h += '<div style="font-family:\'Playfair Display\',serif;font-size:19px;font-weight:700;margin-bottom:8px;">Analyse prete, ' + fn + ' !</div>';
+  h += '<div style="display:inline-block;background:' + qColor + '22;border:1px solid ' + qColor + '55;border-radius:20px;padding:4px 14px;font-size:11px;font-weight:600;color:' + qColor + ';margin-bottom:4px;">' + qEmoji + '</div>';
+  
   h += '</div><div style="padding:0 28px;">';
   h += '<div class="hero"><div class="roi-lbl">Retour sur investissement annuel</div>';
   h += '<div class="roi-num">' + r.roi.toFixed(1) + '%</div>';
@@ -370,8 +373,20 @@ async function doSubmit() {
     if (aiData && aiData.analysis) analysis = aiData.analysis;
   } catch(e) { analysis = null; }
   document.getElementById('load-msg').textContent = 'Envoi du rapport...';
+  var qualification;
+  var mktScore = mkt && mkt.score ? mkt.score : 50;
+  var stageScore = { 'etude': 1, 'local': 2, 'financement': 2, 'ouverture': 3, 'existant': 3 };
+  var stageVal = stageEl.value;
+  var sScore = stageScore[stageVal] || 1;
+  if (r.roi >= 20 && sScore >= 2 && mktScore >= 70) {
+    qualification = 'Lead chaud';
+  } else if (r.roi >= 10 && (sScore >= 2 || mktScore >= 60)) {
+    qualification = 'Lead tiede';
+  } else {
+    qualification = 'Lead froid';
+  }
   try {
-    await fetch('https://formspree.io/f/' + FORMSPREE_ID, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nom: name, email: email, telephone: phone, stade: stage, ville: city || 'Non renseignee', nb_boxes: r.nb, roi_annuel: r.roi.toFixed(1) + '%', ca_mensuel: fmt(r.revM), resultat_net: fmt(r.net), investissement: fmt(r.invest), charges: fmt(r.charges), retour_invest: isFinite(r.pbk) && r.pbk > 0 ? r.pbkY.toFixed(1) + ' ans' : 'N/A', potentiel_marche: mkt ? mkt.potential : 'N/A' }) });
+    await fetch('https://formspree.io/f/' + FORMSPREE_ID, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nom: name, email: email, telephone: phone, stade: stage, ville: city || 'Non renseignee', nb_boxes: r.nb, roi_annuel: r.roi.toFixed(1) + '%', ca_mensuel: fmt(r.revM), resultat_net: fmt(r.net), investissement: fmt(r.invest), charges: fmt(r.charges), retour_invest: isFinite(r.pbk) && r.pbk > 0 ? r.pbkY.toFixed(1) + ' ans' : 'N/A', potentiel_marche: mkt ? mkt.potential : 'N/A', qualification: qualification }) });
   } catch(e) {}
   showResults(r, name, email, mkt, analysis);
 }
