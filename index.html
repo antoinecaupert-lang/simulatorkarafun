@@ -724,7 +724,7 @@
   const HUBSPOT_API_KEY = 'VOTRE_CLE_HUBSPOT_ICI';
   async function searchCompetitors(city, radiusMeters) {
     try {
-      const res = await fetch('/api/places', {
+      const res = await fetch('/api/places.cjs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ city: city, radius: radiusMeters, country: 'France' })
@@ -800,7 +800,7 @@ Ton : professionnel, chaleureux, direct. Pas de liste à puces. Uniquement du te
 
     // 2. Créer le contact dans HubSpot via Netlify Function
     try {
-      await fetch('/api/hubspot', {
+      await fetch('/api/hubspot.cjs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
