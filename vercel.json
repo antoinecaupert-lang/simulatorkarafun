@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/places.js": {
+      "runtime": "nodejs20.x"
+    }
+  }
+}
