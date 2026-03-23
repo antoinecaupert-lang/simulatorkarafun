@@ -34,10 +34,8 @@ module.exports = async function(req, res) {
       'https://maps.googleapis.com/maps/api/geocode/json?address='
       + encodeURIComponent(city + ', ' + country) + '&key=' + KEY
     );
-
-    // Debug: return raw geo response
     if (!geoData.results || !geoData.results[0]) {
-      return res.json({ debug: true, geoStatus: geoData.status, geoError: geoData.error_message || 'no results', count: 0, competitors: [], avgRating: '0', city: city });
+      return res.json({ count: 0, competitors: [], avgRating: '0', city: city });
     }
 
     var loc = geoData.results[0].geometry.location;
@@ -47,16 +45,33 @@ module.exports = async function(req, res) {
       if (comps[i].types.indexOf('locality') !== -1) { cityName = comps[i].long_name; break; }
     }
 
-    var placesData = await get(
+    // Deux recherches séparées pour maximiser les résultats
+    var results1 = await get(
       'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
       + '?location=' + loc.lat + ',' + loc.lng
       + '&radius=' + radius
-      + '&keyword=karaoke+karaoké&type=establishment&key=' + KEY
+      + '&keyword=karaoké&key=' + KEY
+    );
+    var results2 = await get(
+      'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
+      + '?location=' + loc.lat + ',' + loc.lng
+      + '&radius=' + radius
+      + '&keyword=karaoke+bar&key=' + KEY
     );
 
-    // Debug: return places status
-    var results = (placesData.results || []).slice(0, 10);
-    var competitors = results.map(function(p) {
+    // Fusionner et dédupliquer par place_id
+    var all = (results1.results || []).concat(results2.results || []);
+    var seen = {};
+    var unique = [];
+    for (var j = 0; j < all.length; j++) {
+      if (!seen[all[j].place_id]) {
+        seen[all[j].place_id] = true;
+        unique.push(all[j]);
+      }
+    }
+    unique = unique.slice(0, 10);
+
+    var competitors = unique.map(function(p) {
       return { name: p.name, rating: p.rating || null, vicinity: p.vicinity || '' };
     });
     var rated = competitors.filter(function(c) { return c.rating; });
@@ -64,13 +79,7 @@ module.exports = async function(req, res) {
       ? (rated.reduce(function(a, c) { return a + c.rating; }, 0) / rated.length).toFixed(1)
       : '0';
 
-    return res.json({
-      count: competitors.length,
-      competitors: competitors,
-      avgRating: avgRating,
-      city: cityName,
-      placesStatus: placesData.status
-    });
+    return res.json({ count: competitors.length, competitors: competitors, avgRating: avgRating, city: cityName });
   } catch(e) {
     return res.status(500).json({ error: e.message });
   }
