@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -9,16 +9,16 @@ export default async function handler(req, res) {
   const d = req.body || {};
   const symbol = d.currency === 'USD' ? '$' : '€';
 
-  const roiNote = `Simulation ROI Karafun Business
-• Ville : ${d.city || 'Non renseignée'}
-• Nombre de boxes : ${d.nbBoxes}
-• Investissement total : ${symbol}${Number(d.totalInvest).toLocaleString()}
-• CA mensuel estimé : ${symbol}${Number(d.totalRevMonth).toLocaleString()}
-• Charges mensuelles : ${symbol}${Number(d.totalChargesMonth).toLocaleString()}
-• Résultat net/mois : ${symbol}${Number(d.resultMonth).toLocaleString()}
-• ROI annuel : ${d.roiPct}%
-• Retour sur investissement : ${d.payback}
-• Stade du projet : ${d.stage}`;
+  const roiNote = 'Simulation ROI Karafun Business\n'
+    + '• Ville : ' + (d.city || 'Non renseignée') + '\n'
+    + '• Nombre de boxes : ' + d.nbBoxes + '\n'
+    + '• Investissement total : ' + symbol + Number(d.totalInvest).toLocaleString() + '\n'
+    + '• CA mensuel estimé : ' + symbol + Number(d.totalRevMonth).toLocaleString() + '\n'
+    + '• Charges mensuelles : ' + symbol + Number(d.totalChargesMonth).toLocaleString() + '\n'
+    + '• Résultat net/mois : ' + symbol + Number(d.resultMonth).toLocaleString() + '\n'
+    + '• ROI annuel : ' + d.roiPct + '%\n'
+    + '• Retour sur investissement : ' + d.payback + '\n'
+    + '• Stade du projet : ' + d.stage;
 
   try {
     await fetch('https://api.hubapi.com/crm/v3/objects/contacts', {
@@ -37,9 +37,7 @@ export default async function handler(req, res) {
     const searchRes = await fetch('https://api.hubapi.com/crm/v3/objects/contacts/search', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + HUBSPOT_KEY },
-      body: JSON.stringify({
-        filterGroups: [{ filters: [{ propertyName: 'email', operator: 'EQ', value: d.email }] }]
-      })
+      body: JSON.stringify({ filterGroups: [{ filters: [{ propertyName: 'email', operator: 'EQ', value: d.email }] }] })
     });
     const searchData = await searchRes.json();
 
@@ -50,16 +48,12 @@ export default async function handler(req, res) {
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + HUBSPOT_KEY },
         body: JSON.stringify({
           properties: { hs_note_body: roiNote, hs_timestamp: Date.now() },
-          associations: [{
-            to: { id: contactId },
-            types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 202 }]
-          }]
+          associations: [{ to: { id: contactId }, types: [{ associationCategory: 'HUBSPOT_DEFINED', associationTypeId: 202 }] }]
         })
       });
     }
-
     return res.status(200).json({ ok: true });
   } catch(e) {
     return res.status(500).json({ error: e.message });
   }
-}
+};
