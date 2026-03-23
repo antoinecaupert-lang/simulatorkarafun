@@ -45,32 +45,28 @@ module.exports = async function(req, res) {
       if (comps[i].types.indexOf('locality') !== -1) { cityName = comps[i].long_name; break; }
     }
 
-    // Deux recherches séparées pour maximiser les résultats
-    var results1 = await get(
-      'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
-      + '?location=' + loc.lat + ',' + loc.lng
-      + '&radius=' + radius
-      + '&keyword=karaoké+box&key=' + KEY
-    );
-    var results2 = await get(
-      'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
-      + '?location=' + loc.lat + ',' + loc.lng
-      + '&radius=' + radius
-      + '&keyword=karaoke+box&key=' + KEY
-    );
-
-    // Fusionner et dédupliquer par place_id
-    var all = (results1.results || []).concat(results2.results || []);
+    var keywords = ['karaoké box', 'karaoke bar', 'karaoke room'];
     var seen = {};
     var unique = [];
-    for (var j = 0; j < all.length; j++) {
-      if (!seen[all[j].place_id]) {
-        seen[all[j].place_id] = true;
-        unique.push(all[j]);
+
+    for (var k = 0; k < keywords.length; k++) {
+      var result = await get(
+        'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
+        + '?location=' + loc.lat + ',' + loc.lng
+        + '&radius=' + radius
+        + '&keyword=' + encodeURIComponent(keywords[k])
+        + '&key=' + KEY
+      );
+      var places = result.results || [];
+      for (var j = 0; j < places.length; j++) {
+        if (!seen[places[j].place_id]) {
+          seen[places[j].place_id] = true;
+          unique.push(places[j]);
+        }
       }
     }
-    unique = unique.slice(0, 10);
 
+    unique = unique.slice(0, 10);
     var competitors = unique.map(function(p) {
       return { name: p.name, rating: p.rating || null, vicinity: p.vicinity || '' };
     });
