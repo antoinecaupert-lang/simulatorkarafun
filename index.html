@@ -403,7 +403,6 @@
   }
 
   function buildCmpBlock(cmp, radius) {
-    var l = lvl(cmp.count);
     var km = Math.round(radius / 1000);
     var h = '<div class="sh" style="margin-top:0;">Analyse du marché — ' + cmp.city + '</div>';
     h += '<div class="cmpbox">';
@@ -478,7 +477,7 @@
           charges: fmt(r.charges),
           retour_invest: isFinite(r.pbk) && r.pbk > 0 ? r.pbkY.toFixed(1) + ' ans' : 'N/A',
           nb_concurrents: cmp ? cmp.count : 'N/A',
-          niveau_concurrence: cmp ? lvl(cmp.count).label : 'N/A'
+          niveau_concurrence: cmp ? (cmp.potential || 'N/A') : 'N/A'
         })
       });
     } catch(e) { }
