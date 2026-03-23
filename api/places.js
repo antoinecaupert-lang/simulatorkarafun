@@ -45,7 +45,7 @@ module.exports = async function(req, res) {
       if (comps[i].types.indexOf('locality') !== -1) { cityName = comps[i].long_name; break; }
     }
 
-    var keywords = ['karaoké box', 'karaoke room'];
+    var keywords = ['karaoke box'];
     var seen = {};
     var unique = [];
 
@@ -65,6 +65,16 @@ module.exports = async function(req, res) {
         }
       }
     }
+
+    // Filtrer les bars karaoké classiques — garder uniquement les boxes privées
+    var excludeWords = ['bar', 'pub', 'brasserie', 'restaurant', 'café', 'cafe', 'lounge', 'club', 'discothèque', 'disco'];
+    unique = unique.filter(function(p) {
+      var nameLower = p.name.toLowerCase();
+      var types = p.types || [];
+      var isBar = types.indexOf('bar') !== -1 || types.indexOf('night_club') !== -1;
+      var hasExcludeWord = excludeWords.some(function(w) { return nameLower.indexOf(w) !== -1; });
+      return !isBar && !hasExcludeWord;
+    });
 
     unique = unique.slice(0, 10);
     var competitors = unique.map(function(p) {
