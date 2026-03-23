@@ -8,645 +8,352 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --kf-pink: #E8447A;
-    --kf-purple: #7B5EA7;
-    --kf-grad: linear-gradient(135deg, #7B5EA7 0%, #E8447A 100%);
-    --kf-dark: #0D0D0F;
-    --kf-surface: #17171C;
-    --kf-card: #1E1E26;
-    --kf-border: rgba(255,255,255,0.08);
-    --kf-text: #F5F4FF;
-    --kf-muted: rgba(245,244,255,0.5);
-    --kf-input-bg: rgba(255,255,255,0.06);
-    --kf-accent: #FF6FA8;
+    --pink: #E8447A; --purple: #7B5EA7;
+    --grad: linear-gradient(135deg, #7B5EA7 0%, #E8447A 100%);
+    --dark: #0D0D0F; --card: #1E1E26;
+    --border: rgba(255,255,255,0.08);
+    --text: #F5F4FF; --muted: rgba(245,244,255,0.5);
+    --input: rgba(255,255,255,0.06); --accent: #FF6FA8;
   }
-
-  html, body {
-    min-height: 100vh;
-    background: var(--kf-dark);
-    font-family: 'DM Sans', sans-serif;
-    color: var(--kf-text);
+  html, body { min-height: 100vh; background: var(--dark); font-family: 'DM Sans', sans-serif; color: var(--text); }
+  body { display: flex; flex-direction: column; align-items: center; padding: 40px 16px 60px; }
+  body::before { content: ''; position: fixed; top: -150px; right: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(123,94,167,0.18) 0%, transparent 65%); pointer-events: none; z-index: 0; }
+  body::after { content: ''; position: fixed; bottom: -100px; left: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(232,68,122,0.12) 0%, transparent 65%); pointer-events: none; z-index: 0; }
+  #app { position: relative; z-index: 1; width: 100%; max-width: 640px; background: #17171C; border-radius: 20px; border: 1px solid var(--border); overflow: hidden; }
+  .hdr { padding: 24px 28px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 14px; }
+  .logo { width: 40px; height: 40px; flex-shrink: 0; }
+  .brand { flex: 1; }
+  .brand-name { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 900; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; }
+  .brand-sub { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
+  .tagline { font-size: 11px; color: var(--muted); text-align: right; max-width: 140px; line-height: 1.5; }
+  .step { display: none; padding: 24px 28px 28px; }
+  .step.on { display: block; }
+  .prog { display: flex; gap: 6px; margin-bottom: 20px; }
+  .dot { height: 3px; border-radius: 2px; flex: 1; background: var(--border); transition: background .3s; }
+  .dot.done, .dot.on { background: var(--pink); }
+  .ttl { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .sub { font-size: 12px; color: var(--muted); margin-bottom: 22px; }
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .g1 { display: grid; gap: 12px; }
+  .f { display: flex; flex-direction: column; gap: 5px; }
+  .lbl { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1.2px; }
+  .hint { font-size: 10px; color: rgba(245,244,255,0.3); }
+  input[type=text], input[type=number], input[type=email], input[type=tel], select {
+    background: var(--input); border: 1px solid var(--border); border-radius: 10px;
+    color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px;
+    padding: 11px 12px; width: 100%; outline: none;
+    transition: border-color .2s, background .2s; -webkit-appearance: none; appearance: none;
   }
-
-  body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 40px 16px 60px;
-  }
-
-  /* Ambient glows */
-  body::before {
-    content: '';
-    position: fixed; top: -150px; right: -150px;
-    width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(123,94,167,0.18) 0%, transparent 65%);
-    pointer-events: none; z-index: 0;
-  }
-  body::after {
-    content: '';
-    position: fixed; bottom: -100px; left: -100px;
-    width: 500px; height: 500px;
-    background: radial-gradient(circle, rgba(232,68,122,0.12) 0%, transparent 65%);
-    pointer-events: none; z-index: 0;
-  }
-
-  #app {
-    position: relative; z-index: 1;
-    width: 100%; max-width: 640px;
-    background: #17171C;
-    border-radius: 20px;
-    border: 1px solid var(--kf-border);
-    overflow: hidden;
-  }
-
-  /* ── Header ── */
-  .kf-header {
-    padding: 28px 32px 24px;
-    border-bottom: 1px solid var(--kf-border);
-    display: flex; align-items: center; gap: 16px;
-  }
-  .kf-logo-mark { width: 44px; height: 44px; flex-shrink: 0; }
-  .kf-brand { flex: 1; }
-  .kf-brand-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 22px; font-weight: 900;
-    background: var(--kf-grad);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text; line-height: 1;
-  }
-  .kf-brand-sub {
-    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
-    color: var(--kf-muted); margin-top: 4px;
-  }
-  .kf-tagline {
-    font-size: 12px; color: var(--kf-muted);
-    text-align: right; max-width: 160px; line-height: 1.5;
-  }
-
-  /* ── Steps ── */
-  .kf-step { display: none; padding: 28px 32px 32px; }
-  .kf-step.active { display: block; }
-
-  .kf-progress { display: flex; gap: 6px; margin-bottom: 24px; }
-  .kf-prog-dot {
-    height: 3px; border-radius: 2px; flex: 1;
-    background: var(--kf-border); transition: background .3s;
-  }
-  .kf-prog-dot.done { background: var(--kf-pink); }
-  .kf-prog-dot.active { background: var(--kf-grad); background: var(--kf-pink); }
-
-  .kf-step-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 24px; font-weight: 700;
-    margin-bottom: 6px; line-height: 1.2;
-  }
-  .kf-step-desc { font-size: 13px; color: var(--kf-muted); margin-bottom: 26px; }
-
-  /* ── Grid ── */
-  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
-  .g1 { display: grid; gap: 14px; }
-
-  /* ── Field ── */
-  .field { display: flex; flex-direction: column; gap: 6px; }
-  .label {
-    font-size: 11px; font-weight: 600; color: var(--kf-muted);
-    text-transform: uppercase; letter-spacing: 1.2px;
-  }
-  .sublabel { font-size: 11px; color: rgba(245,244,255,0.3); }
-
-  .inp, .sel {
-    background: var(--kf-input-bg);
-    border: 1px solid var(--kf-border);
-    border-radius: 10px;
-    color: var(--kf-text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    padding: 12px 14px;
-    width: 100%; outline: none;
-    transition: border-color .2s, background .2s;
-    -webkit-appearance: none; appearance: none;
-  }
-  .inp:focus, .sel:focus {
-    border-color: var(--kf-pink);
-    background: rgba(232,68,122,0.07);
-  }
-  .sel option { background: #1E1E26; color: var(--kf-text); }
-
-  .inp-wrap { position: relative; }
-  .pfx {
-    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-    font-size: 14px; color: var(--kf-muted); pointer-events: none;
-  }
-  .inp-wrap .inp { padding-left: 28px; }
-  .sfx {
-    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-    font-size: 12px; color: var(--kf-muted); pointer-events: none;
-  }
-  .inp-wrap.has-sfx .inp { padding-right: 42px; }
-
-  /* ── Slider ── */
-  .slider-wrap { display: flex; flex-direction: column; gap: 8px; }
-  .slider-val { font-size: 18px; font-weight: 600; color: var(--kf-accent); text-align: center; }
-  input[type=range] {
-    -webkit-appearance: none; appearance: none;
-    width: 100%; height: 4px; border-radius: 2px;
-    background: rgba(255,255,255,0.12); outline: none; cursor: pointer;
-  }
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
-    background: var(--kf-pink); cursor: pointer;
-    box-shadow: 0 0 0 4px rgba(232,68,122,0.2);
-  }
-  input[type=range]::-moz-range-thumb {
-    width: 20px; height: 20px; border-radius: 50%; border: none;
-    background: var(--kf-pink); cursor: pointer;
-  }
-  .slider-labels {
-    display: flex; justify-content: space-between;
-    font-size: 11px; color: var(--kf-muted);
-  }
-
-  /* ── Section heading ── */
-  .sh {
-    font-size: 11px; font-weight: 600; color: var(--kf-muted);
-    text-transform: uppercase; letter-spacing: 2px;
-    margin: 20px 0 14px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .sh::after { content: ''; flex: 1; height: 1px; background: var(--kf-border); }
-
-  /* ── Buttons ── */
-  .btn {
-    width: 100%; padding: 14px;
-    background: var(--kf-grad);
-    border: none; border-radius: 10px;
-    color: #fff; font-family: 'DM Sans', sans-serif;
-    font-size: 15px; font-weight: 600;
-    cursor: pointer; margin-top: 22px;
-    transition: opacity .2s, transform .1s;
-    letter-spacing: .3px;
-  }
+  input:focus, select:focus { border-color: var(--pink); background: rgba(232,68,122,0.07); }
+  select option { background: #1E1E26; }
+  .pw { position: relative; }
+  .pw .pfx { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 13px; color: var(--muted); pointer-events: none; }
+  .pw input { padding-left: 26px; }
+  .pw .sfx { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 11px; color: var(--muted); pointer-events: none; }
+  .pw.rs input { padding-right: 40px; }
+  .sv { display: flex; flex-direction: column; gap: 6px; }
+  .sv-val { font-size: 17px; font-weight: 600; color: var(--accent); text-align: center; }
+  input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.12); outline: none; cursor: pointer; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--pink); cursor: pointer; box-shadow: 0 0 0 3px rgba(232,68,122,0.2); }
+  .sl { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); }
+  .sh { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin: 18px 0 12px; display: flex; align-items: center; gap: 8px; }
+  .sh::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .btn { width: 100%; padding: 13px; background: var(--grad); border: none; border-radius: 10px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 20px; transition: opacity .2s, transform .1s; }
   .btn:hover { opacity: .88; }
   .btn:active { transform: scale(.99); }
-  .btn-ghost {
-    background: transparent;
-    border: 1px solid var(--kf-border);
-    color: var(--kf-muted); margin-top: 10px;
-  }
-  .btn-ghost:hover { border-color: var(--kf-pink); color: var(--kf-text); opacity: 1; }
-  .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 22px; }
-  .btn-row .btn, .btn-row .btn-ghost { margin-top: 0; }
-
-  /* ── Lead card ── */
-  .lead-card {
-    background: var(--kf-card); border: 1px solid var(--kf-border);
-    border-radius: 14px; padding: 20px; margin-bottom: 20px;
-  }
-  .lead-card-title {
-    font-size: 13px; font-weight: 600; margin-bottom: 8px;
-    background: var(--kf-grad);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .lead-card-body { font-size: 13px; color: var(--kf-muted); line-height: 1.65; }
-
-  /* ── Notice ── */
-  .notice {
-    background: rgba(123,94,167,0.12);
-    border: 1px solid rgba(123,94,167,0.28);
-    border-radius: 10px; padding: 14px 16px;
-    font-size: 12px; color: var(--kf-muted); line-height: 1.65;
-    display: flex; gap: 10px; align-items: flex-start;
-    margin-bottom: 16px;
-  }
-
-  /* ── Checkbox ── */
-  .cb-wrap { display: flex; align-items: flex-start; gap: 10px; margin-top: 14px; }
-  input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--kf-pink); flex-shrink: 0; margin-top: 2px; }
-  .cb-label { font-size: 11px; color: var(--kf-muted); line-height: 1.55; }
-
-  /* ── Errors ── */
-  .err { color: #FF6B6B; font-size: 12px; margin-top: 4px; display: none; }
-
-  /* ── Spinner / Result ── */
-  .sending { text-align: center; padding: 56px 20px; }
-  .spinner {
-    width: 44px; height: 44px; border-radius: 50%;
-    border: 3px solid rgba(255,255,255,.08);
-    border-top-color: var(--kf-pink);
-    animation: spin .8s linear infinite;
-    margin: 0 auto 18px;
-  }
+  .btn-g { background: transparent; border: 1px solid var(--border); color: var(--muted); margin-top: 8px; }
+  .btn-g:hover { border-color: var(--pink); color: var(--text); opacity: 1; }
+  .br { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+  .br .btn, .br .btn-g { margin-top: 0; }
+  .lcard { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 18px; }
+  .lcard-t { font-size: 13px; font-weight: 600; margin-bottom: 6px; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .lcard-b { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .notice { background: rgba(123,94,167,0.12); border: 1px solid rgba(123,94,167,0.28); border-radius: 10px; padding: 12px 14px; font-size: 11px; color: var(--muted); line-height: 1.6; display: flex; gap: 8px; align-items: flex-start; margin-bottom: 14px; }
+  .cbw { display: flex; align-items: flex-start; gap: 10px; margin-top: 12px; }
+  input[type=checkbox] { width: 15px; height: 15px; accent-color: var(--pink); flex-shrink: 0; margin-top: 2px; }
+  .cbl { font-size: 11px; color: var(--muted); line-height: 1.5; }
+  .err { color: #FF6B6B; font-size: 11px; margin-top: 3px; display: none; }
+  .spin-wrap { text-align: center; padding: 50px 20px; }
+  .spinner { width: 40px; height: 40px; border-radius: 50%; border: 3px solid rgba(255,255,255,.08); border-top-color: var(--pink); animation: spin .8s linear infinite; margin: 0 auto 16px; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* ── Results ── */
-  .results-hero {
-    background: var(--kf-card); border: 1px solid rgba(232,68,122,.28);
-    border-radius: 16px; padding: 28px 20px;
-    text-align: center; margin-bottom: 16px;
-  }
-  .roi-badge {
-    display: inline-block;
-    background: var(--kf-grad);
-    color: #fff; font-family: 'Playfair Display', serif;
-    font-size: 56px; font-weight: 900; line-height: 1;
-    padding: 10px 28px; border-radius: 14px; margin: 10px 0;
-  }
-  .roi-badge-label {
-    font-size: 11px; color: var(--kf-muted); letter-spacing: 2px;
-    text-transform: uppercase;
-  }
-  .roi-sub { font-size: 13px; color: var(--kf-muted); margin-top: 10px; }
-
-  .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-  .metric {
-    background: var(--kf-card); border: 1px solid var(--kf-border);
-    border-radius: 12px; padding: 14px 16px;
-  }
-  .metric-label { font-size: 11px; color: var(--kf-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-  .metric-val { font-size: 20px; font-weight: 600; }
-  .pos { color: #5DE8A6; } .neg { color: #FF6B6B; } .acc { color: var(--kf-accent); }
-
-  .charges-table {
-    background: var(--kf-card); border: 1px solid var(--kf-border);
-    border-radius: 12px; overflow: hidden; margin-bottom: 16px;
-  }
-  .charge-row {
-    display: flex; justify-content: space-between;
-    padding: 10px 16px; font-size: 13px;
-    border-bottom: 1px solid var(--kf-border);
-  }
-  .charge-row:last-child { border-bottom: none; }
-  .charge-row.total { background: rgba(232,68,122,.08); font-weight: 600; font-size: 14px; }
-  .charge-name { color: var(--kf-muted); }
-
-  .ai-box {
-    background: rgba(123,94,167,.12);
-    border: 1px solid rgba(123,94,167,.25);
-    border-radius: 12px; padding: 18px; margin-bottom: 16px;
-  }
-  .ai-box-title { font-size: 12px; font-weight: 600; color: rgba(180,150,230,.9); margin-bottom: 10px; }
-  .ai-box-body { font-size: 13px; color: var(--kf-muted); line-height: 1.7; }
-
-  .success-icon {
-    width: 56px; height: 56px; border-radius: 50%;
-    background: rgba(93,232,166,.12); border: 2px solid rgba(93,232,166,.35);
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 14px;
-  }
-
-  /* ── Footer ── */
-  .kf-footer {
-    text-align: center; margin-top: 28px;
-    font-size: 11px; color: rgba(245,244,255,0.2);
-    letter-spacing: .5px;
-  }
-  .kf-footer a { color: rgba(232,68,122,.5); text-decoration: none; }
-
-  @media (max-width: 480px) {
-    body { padding: 16px 10px 40px; }
-    .kf-header { padding: 20px; }
-    .kf-step { padding: 20px; }
-    .g2, .g3 { grid-template-columns: 1fr; }
-    .kf-tagline { display: none; }
-    .roi-badge { font-size: 42px; }
-  }
+  .hero { background: var(--card); border: 1px solid rgba(232,68,122,.28); border-radius: 16px; padding: 24px 18px; text-align: center; margin-bottom: 14px; }
+  .roi-num { display: inline-block; background: var(--grad); color: #fff; font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 900; line-height: 1; padding: 8px 24px; border-radius: 12px; margin: 8px 0; }
+  .roi-lbl { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+  .roi-sub { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .mets { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .met { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+  .met-l { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
+  .met-v { font-size: 18px; font-weight: 600; }
+  .pos { color: #5DE8A6; } .neg { color: #FF6B6B; } .acc { color: var(--accent); }
+  .ctab { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 14px; }
+  .crow { display: flex; justify-content: space-between; padding: 9px 14px; font-size: 12px; border-bottom: 1px solid var(--border); }
+  .crow:last-child { border-bottom: none; }
+  .crow.tot { background: rgba(232,68,122,.08); font-weight: 600; font-size: 13px; }
+  .cn { color: var(--muted); }
+  .aibox { background: rgba(123,94,167,.12); border: 1px solid rgba(123,94,167,.25); border-radius: 10px; padding: 16px; margin-bottom: 14px; }
+  .aibox-t { font-size: 11px; font-weight: 600; color: rgba(180,150,230,.9); margin-bottom: 8px; }
+  .aibox-b { font-size: 12px; color: var(--muted); line-height: 1.7; }
+  .cmpbox { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 14px; }
+  .cmprow { display: flex; justify-content: space-between; align-items: center; padding: 9px 14px; font-size: 12px; border-bottom: 1px solid var(--border); }
+  .cmprow:last-child { border-bottom: none; }
+  .okico { width: 50px; height: 50px; border-radius: 50%; background: rgba(93,232,166,.12); border: 2px solid rgba(93,232,166,.35); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+  footer { text-align: center; margin-top: 24px; font-size: 11px; color: rgba(245,244,255,0.2); position: relative; z-index: 1; }
+  footer a { color: rgba(232,68,122,.5); text-decoration: none; }
+  @media (max-width: 480px) { body { padding: 12px 8px 40px; } .hdr, .step { padding: 18px; } .g2, .g3 { grid-template-columns: 1fr; } .tagline { display: none; } .roi-num { font-size: 40px; } }
 </style>
 </head>
 <body>
-
-<!-- Formulaire caché pour Netlify Forms -->
-<form name="simulation-roi" netlify netlify-honeypot="bot-field" hidden>
-  <input type="text" name="nom" />
-  <input type="email" name="email" />
-  <input type="tel" name="telephone" />
-  <input type="text" name="stade_projet" />
-  <input type="text" name="ville" />
-  <input type="text" name="nb_boxes" />
-  <input type="text" name="roi_annuel" />
-  <input type="text" name="ca_mensuel" />
-  <input type="text" name="resultat_net_mensuel" />
-  <input type="text" name="investissement_total" />
-  <input type="text" name="charges_mensuelles" />
-  <input type="text" name="delai_retour_invest" />
-  <input type="text" name="nb_concurrents" />
-  <input type="text" name="niveau_concurrence" />
-</form>
-
 <div id="app">
 
-  <!-- ── Header ── -->
-  <div class="kf-header">
-    <svg class="kf-logo-mark" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="#7B5EA7"/>
-          <stop offset="100%" stop-color="#E8447A"/>
-        </linearGradient>
-      </defs>
-      <path d="M8 4 L8 40 L26 22 Z" fill="url(#lg)" opacity="0.95"/>
-      <path d="M36 4 L36 40 L18 22 Z" fill="url(#lg)" opacity="0.55"/>
+  <div class="hdr">
+    <svg class="logo" viewBox="0 0 40 40" fill="none">
+      <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7B5EA7"/><stop offset="100%" stop-color="#E8447A"/></linearGradient></defs>
+      <path d="M7 4 L7 36 L24 20 Z" fill="url(#lg)" opacity="0.95"/>
+      <path d="M33 4 L33 36 L16 20 Z" fill="url(#lg)" opacity="0.55"/>
     </svg>
-    <div class="kf-brand">
-      <div class="kf-brand-name">Karafun</div>
-      <div class="kf-brand-sub">Business · Simulateur ROI</div>
+    <div class="brand">
+      <div class="brand-name">Karafun</div>
+      <div class="brand-sub">Business · Simulateur ROI</div>
     </div>
-    <div class="kf-tagline">Estimez votre retour sur investissement</div>
+    <div class="tagline">Estimez votre retour sur investissement</div>
   </div>
 
-  <!-- ══════════════════════════════════
-       STEP 1 — Configuration
-  ══════════════════════════════════ -->
-  <div class="kf-step active" id="step1">
-    <div class="kf-progress">
-      <div class="kf-prog-dot active"></div>
-      <div class="kf-prog-dot"></div>
-      <div class="kf-prog-dot"></div>
-    </div>
-    <div class="kf-step-title">Votre projet karaoké</div>
-    <div class="kf-step-desc">Configurez vos boxes et votre modèle d'exploitation</div>
+  <!-- ÉTAPE 1 -->
+  <div class="step on" id="s1">
+    <div class="prog"><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+    <div class="ttl">Votre projet karaoké</div>
+    <div class="sub">Configurez vos boxes et votre modèle d'exploitation</div>
 
-    <div class="sh">Localisation &amp; Projet</div>
-    <div class="g2" style="margin-bottom:14px;">
-      <div class="field">
-        <label class="label">Ville du projet</label>
-        <input type="text" class="inp" id="city" placeholder="Paris, Lyon, Bordeaux…">
-        <span class="sublabel" id="city-status"></span>
+    <div class="sh">Localisation</div>
+    <div class="g2">
+      <div class="f">
+        <label class="lbl">Ville du projet</label>
+        <input type="text" id="city" placeholder="Paris, Lyon, Bordeaux…">
       </div>
-      <div class="field">
-        <label class="label">Rayon d'analyse</label>
-        <select class="sel" id="radius">
+      <div class="f">
+        <label class="lbl">Rayon d'analyse</label>
+        <select id="radius">
           <option value="5000">5 km</option>
           <option value="10000" selected>10 km</option>
           <option value="20000">20 km</option>
         </select>
       </div>
     </div>
-    <div class="sh">Parc de boxes</div>
+
+    <div class="sh">Boxes</div>
     <div class="g2">
-      <div class="field">
-        <label class="label">Nombre de boxes</label>
-        <div class="slider-wrap">
-          <div class="slider-val" id="nb-val">2 boxes</div>
-          <input type="range" id="nb-boxes" min="1" max="20" value="2" step="1">
-          <div class="slider-labels"><span>1</span><span>20</span></div>
+      <div class="f">
+        <label class="lbl">Nombre de boxes</label>
+        <div class="sv">
+          <div class="sv-val" id="nb-v">2 boxes</div>
+          <input type="range" id="nb" min="1" max="20" value="2" step="1">
+          <div class="sl"><span>1</span><span>20</span></div>
         </div>
       </div>
-      <div class="field">
-        <label class="label">Capacité par box</label>
-        <div class="inp-wrap has-sfx">
-          <input type="number" class="inp" id="box-cap" value="8" min="2" max="20">
-          <span class="sfx">pers.</span>
+      <div class="f">
+        <label class="lbl">Taux d'occupation</label>
+        <div class="sv">
+          <div class="sv-val" id="occ-v">55%</div>
+          <input type="range" id="occ" min="10" max="100" value="55" step="5">
+          <div class="sl"><span>10%</span><span>100%</span></div>
         </div>
-        <span class="sublabel">Nombre max de personnes</span>
       </div>
     </div>
 
     <div class="sh">Tarification</div>
     <div class="g3">
-      <div class="field">
-        <label class="label">Tarif/h semaine</label>
-        <div class="inp-wrap"><span class="pfx">€</span><input type="number" class="inp" id="price-week" value="35" min="5"></div>
+      <div class="f">
+        <label class="lbl">Tarif/h semaine</label>
+        <div class="pw"><span class="pfx">€</span><input type="number" id="pw" value="35" min="5"></div>
       </div>
-      <div class="field">
-        <label class="label">Tarif/h week-end</label>
-        <div class="inp-wrap"><span class="pfx">€</span><input type="number" class="inp" id="price-wknd" value="45" min="5"></div>
+      <div class="f">
+        <label class="lbl">Tarif/h week-end</label>
+        <div class="pw"><span class="pfx">€</span><input type="number" id="pwe" value="45" min="5"></div>
       </div>
-      <div class="field">
-        <label class="label">Durée moy. session</label>
-        <div class="inp-wrap has-sfx"><input type="number" class="inp" id="session-dur" value="1.5" min="0.5" max="4" step="0.5"><span class="sfx">h</span></div>
+      <div class="f">
+        <label class="lbl">Durée session</label>
+        <div class="pw rs"><input type="number" id="dur" value="1.5" min="0.5" max="4" step="0.5"><span class="sfx">h</span></div>
       </div>
     </div>
 
-    <div class="sh">Exploitation</div>
+    <div class="sh">Horaires</div>
     <div class="g2">
-      <div class="field">
-        <label class="label">Taux d'occupation</label>
-        <div class="slider-wrap">
-          <div class="slider-val" id="occ-val">55%</div>
-          <input type="range" id="occ-rate" min="10" max="100" value="55" step="5">
-          <div class="slider-labels"><span>10%</span><span>100%</span></div>
-        </div>
+      <div class="f">
+        <label class="lbl">Heures/jour</label>
+        <div class="pw rs"><input type="number" id="hpd" value="10" min="4" max="24"><span class="sfx">h</span></div>
       </div>
-      <div class="field">
-        <label class="label">Heures/jour</label>
-        <div class="inp-wrap has-sfx"><input type="number" class="inp" id="hours-day" value="10" min="4" max="24"><span class="sfx">h</span></div>
-      </div>
-    </div>
-    <div class="g2" style="margin-top:14px;">
-      <div class="field">
-        <label class="label">Jours/semaine</label>
-        <select class="sel" id="days-week">
+      <div class="f">
+        <label class="lbl">Jours/semaine</label>
+        <select id="dpw">
           <option value="5">5 jours (lun–ven)</option>
           <option value="6" selected>6 jours (lun–sam)</option>
           <option value="7">7 jours</option>
         </select>
       </div>
     </div>
-    <input type="hidden" id="pct-week" value="60">
 
-    <button class="btn" onclick="go(2)">Étape suivante — Charges &amp; Investissement →</button>
+    <button class="btn" onclick="go(2)">Étape suivante — Charges →</button>
   </div>
 
-  <!-- ══════════════════════════════════
-       STEP 2 — Charges
-  ══════════════════════════════════ -->
-  <div class="kf-step" id="step2">
-    <div class="kf-progress">
-      <div class="kf-prog-dot done"></div>
-      <div class="kf-prog-dot active"></div>
-      <div class="kf-prog-dot"></div>
-    </div>
-    <div class="kf-step-title">Charges &amp; Investissement</div>
-    <div class="kf-step-desc">Renseignez l'ensemble de vos coûts pour un calcul précis</div>
+  <!-- ÉTAPE 2 -->
+  <div class="step" id="s2">
+    <div class="prog"><div class="dot done"></div><div class="dot on"></div><div class="dot"></div></div>
+    <div class="ttl">Charges &amp; Investissement</div>
+    <div class="sub">Renseignez vos coûts pour un calcul précis</div>
 
     <div class="sh">Investissement initial</div>
     <div class="g2">
-      <div class="field">
-        <label class="label">Aménagement / box</label>
-        <div class="inp-wrap"><span class="pfx">€</span><input type="number" class="inp" id="inv-box" value="8000" step="500"></div>
-        <span class="sublabel">Travaux, déco, insonorisation</span>
+      <div class="f">
+        <label class="lbl">Aménagement / box</label>
+        <div class="pw"><span class="pfx">€</span><input type="number" id="ibox" value="8000" step="500"></div>
+        <span class="hint">Travaux, déco, insonorisation</span>
       </div>
-      <div class="field">
-        <label class="label">Matériel / box</label>
-        <div class="inp-wrap"><span class="pfx">€</span><input type="number" class="inp" id="inv-mat" value="5000" step="500"></div>
-        <span class="sublabel">Écrans, micros, sono, PC</span>
+      <div class="f">
+        <label class="lbl">Matériel / box</label>
+        <div class="pw"><span class="pfx">€</span><input type="number" id="imat" value="5000" step="500"></div>
+        <span class="hint">Écrans, micros, sono, PC</span>
       </div>
-      <div class="field">
-        <label class="label">Frais de structure</label>
-        <div class="inp-wrap"><span class="pfx">€</span><input type="number" class="inp" id="inv-struct" value="5000" step="500"></div>
-        <span class="sublabel">Accueil, logiciel résa, caisse</span>
+      <div class="f">
+        <label class="lbl">Frais de structure</label>
+        <div class="pw"><span class="pfx">€</span><input type="number" id="istr" value="5000" step="500"></div>
+        <span class="hint">Logiciel résa, caisse</span>
       </div>
-      <div class="field">
-        <label class="label">Amortissement sur</label>
-        <div class="inp-wrap has-sfx"><input type="number" class="inp" id="amort-years" value="5" min="1" max="15"><span class="sfx">ans</span></div>
+      <div class="f">
+        <label class="lbl">Amortissement sur</label>
+        <div class="pw rs"><input type="number" id="amort" value="5" min="1" max="15"><span class="sfx">ans</span></div>
       </div>
     </div>
 
     <div class="sh">Charges fixes mensuelles</div>
     <div class="g2">
-      <div class="field">
-        <label class="label">Loyer</label>
-        <div class="inp-wrap"><span class="pfx">€</span><input type="number" class="inp" id="rent" value="3000" step="100"></div>
+      <div class="f">
+        <label class="lbl">Loyer</label>
+        <div class="pw"><span class="pfx">€</span><input type="number" id="rent" value="3000" step="100"></div>
       </div>
-      <div class="field">
-        <label class="label">Charges locatives</label>
-        <div class="inp-wrap"><span class="pfx">€</span><input type="number" class="inp" id="charges-loc" value="400" step="50"></div>
+      <div class="f">
+        <label class="lbl">Charges locatives</label>
+        <div class="pw"><span class="pfx">€</span><input type="number" id="cloc" value="400" step="50"></div>
       </div>
-      <div class="field">
-        <label class="label">Masse salariale</label>
-        <div class="inp-wrap"><span class="pfx">€</span><input type="number" class="inp" id="salaries" value="3500" step="100"></div>
-        <span class="sublabel">Charges patronales incluses</span>
+      <div class="f">
+        <label class="lbl">Masse salariale</label>
+        <div class="pw"><span class="pfx">€</span><input type="number" id="sal" value="3500" step="100"></div>
+        <span class="hint">Charges patronales incluses</span>
       </div>
-      <div class="field">
-        <label class="label">Abonnement Karafun</label>
-        <div class="inp-wrap"><span class="pfx">€</span><input type="number" class="inp" id="kf-sub" value="398" step="1" readonly style="opacity:.7;cursor:default;border-color:rgba(232,68,122,0.3);background:rgba(232,68,122,0.05);"></div>
-        <span class="sublabel" id="kf-sub-label">199 € × 2 boxes = 398 €/mois</span>
+      <div class="f">
+        <label class="lbl">Abonnement Karafun</label>
+        <div class="pw"><span class="pfx">€</span><input type="number" id="kfsub" value="398" readonly style="opacity:.7;cursor:default;border-color:rgba(232,68,122,0.3);background:rgba(232,68,122,0.05);"></div>
+        <span class="hint" id="kfsub-hint">199 € × 2 boxes = 398 €/mois</span>
       </div>
     </div>
 
     <div class="sh">Autres charges mensuelles</div>
     <div class="g3">
-      <div class="field">
-        <label class="label">Énergie</label>
-        <div class="inp-wrap"><span class="pfx">€</span><input type="number" class="inp" id="energy" value="600" step="50"></div>
-      </div>
-      <div class="field">
-        <label class="label">Assurance</label>
-        <div class="inp-wrap"><span class="pfx">€</span><input type="number" class="inp" id="insurance" value="250" step="25"></div>
-      </div>
-      <div class="field">
-        <label class="label">Comptabilité</label>
-        <div class="inp-wrap"><span class="pfx">€</span><input type="number" class="inp" id="accounting" value="200" step="25"></div>
-      </div>
-      <div class="field">
-        <label class="label">Marketing</label>
-        <div class="inp-wrap"><span class="pfx">€</span><input type="number" class="inp" id="marketing" value="400" step="50"></div>
-      </div>
-      <div class="field">
-        <label class="label">Maintenance</label>
-        <div class="inp-wrap"><span class="pfx">€</span><input type="number" class="inp" id="maintenance" value="200" step="25"></div>
-      </div>
-      <div class="field">
-        <label class="label">Divers</label>
-        <div class="inp-wrap"><span class="pfx">€</span><input type="number" class="inp" id="misc" value="150" step="25"></div>
-      </div>
+      <div class="f"><label class="lbl">Énergie</label><div class="pw"><span class="pfx">€</span><input type="number" id="energy" value="600" step="50"></div></div>
+      <div class="f"><label class="lbl">Assurance</label><div class="pw"><span class="pfx">€</span><input type="number" id="insur" value="250" step="25"></div></div>
+      <div class="f"><label class="lbl">Comptabilité</label><div class="pw"><span class="pfx">€</span><input type="number" id="acct" value="200" step="25"></div></div>
+      <div class="f"><label class="lbl">Marketing</label><div class="pw"><span class="pfx">€</span><input type="number" id="mktg" value="400" step="50"></div></div>
+      <div class="f"><label class="lbl">Maintenance</label><div class="pw"><span class="pfx">€</span><input type="number" id="maint" value="200" step="25"></div></div>
+      <div class="f"><label class="lbl">Divers</label><div class="pw"><span class="pfx">€</span><input type="number" id="misc" value="150" step="25"></div></div>
     </div>
 
-    <div class="btn-row">
-      <button class="btn btn-ghost" onclick="go(1)">← Retour</button>
+    <div class="br">
+      <button class="btn btn-g" onclick="go(1)">← Retour</button>
       <button class="btn" onclick="go(3)">Obtenir mon résultat →</button>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════
-       STEP 3 — Coordonnées
-  ══════════════════════════════════ -->
-  <div class="kf-step" id="step3">
-    <div class="kf-progress">
-      <div class="kf-prog-dot done"></div>
-      <div class="kf-prog-dot done"></div>
-      <div class="kf-prog-dot active"></div>
-    </div>
-    <div class="kf-step-title">Recevez votre analyse</div>
-    <div class="kf-step-desc">Votre rapport personnalisé vous sera envoyé par email</div>
+  <!-- ÉTAPE 3 -->
+  <div class="step" id="s3">
+    <div class="prog"><div class="dot done"></div><div class="dot done"></div><div class="dot on"></div></div>
+    <div class="ttl">Recevez votre analyse</div>
+    <div class="sub">Votre rapport ROI personnalisé vous sera envoyé par email</div>
 
-    <div class="lead-card">
-      <div class="lead-card-title">✦ Votre simulation est prête</div>
-      <div class="lead-card-body">Renseignez vos coordonnées pour recevoir votre rapport ROI complet par email. Un expert Karafun Business sera également disponible pour vous accompagner.</div>
+    <div class="lcard">
+      <div class="lcard-t">✦ Votre simulation est prête</div>
+      <div class="lcard-b">Renseignez vos coordonnées pour recevoir votre rapport complet. Un expert Karafun Business sera disponible pour vous accompagner.</div>
     </div>
 
     <div class="g1">
-      <div class="field">
-        <label class="label">Prénom &amp; Nom</label>
-        <input type="text" class="inp" id="lead-name" placeholder="Jean Dupont">
-        <span class="err" id="err-name">Veuillez renseigner votre nom</span>
+      <div class="f">
+        <label class="lbl">Prénom &amp; Nom</label>
+        <input type="text" id="lname" placeholder="Jean Dupont">
+        <span class="err" id="e-name">Veuillez renseigner votre nom</span>
       </div>
-      <div class="field">
-        <label class="label">Adresse email</label>
-        <input type="email" class="inp" id="lead-email" placeholder="jean@exemple.fr">
-        <span class="err" id="err-email">Adresse email invalide</span>
+      <div class="f">
+        <label class="lbl">Email</label>
+        <input type="email" id="lemail" placeholder="jean@exemple.fr">
+        <span class="err" id="e-email">Email invalide</span>
       </div>
-      <div class="field">
-        <label class="label">Téléphone</label>
-        <input type="tel" class="inp" id="lead-phone" placeholder="+33 6 12 34 56 78">
-        <span class="err" id="err-phone">Numéro de téléphone requis</span>
+      <div class="f">
+        <label class="lbl">Téléphone</label>
+        <input type="tel" id="lphone" placeholder="+33 6 12 34 56 78">
+        <span class="err" id="e-phone">Téléphone requis</span>
       </div>
-      <div class="field">
-        <label class="label">Stade de votre projet</label>
-        <select class="sel" id="lead-stage">
+      <div class="f">
+        <label class="lbl">Stade du projet</label>
+        <select id="lstage">
           <option value="etude">En phase d'étude</option>
-          <option value="local">Recherche de local en cours</option>
+          <option value="local">Recherche de local</option>
           <option value="financement">Recherche de financement</option>
-          <option value="ouverture">Ouverture prévue d'ici 6 mois</option>
-          <option value="existant">Établissement déjà existant</option>
+          <option value="ouverture">Ouverture dans 6 mois</option>
+          <option value="existant">Établissement existant</option>
         </select>
       </div>
     </div>
 
-    <div class="notice" style="margin-top:18px;">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px;">
-        <circle cx="8" cy="8" r="7" stroke="rgba(123,94,167,0.7)" stroke-width="1.5"/>
-        <line x1="8" y1="7" x2="8" y2="11" stroke="rgba(123,94,167,0.7)" stroke-width="1.5" stroke-linecap="round"/>
-        <circle cx="8" cy="5" r="0.75" fill="rgba(123,94,167,0.7)"/>
-      </svg>
-      Données traitées conformément au RGPD. Karafun Business ne revend jamais vos informations. Vous pouvez vous désinscrire à tout moment.
+    <div class="notice" style="margin-top:16px;">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px;"><circle cx="8" cy="8" r="7" stroke="rgba(123,94,167,0.7)" stroke-width="1.5"/><line x1="8" y1="7" x2="8" y2="11" stroke="rgba(123,94,167,0.7)" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="5" r="0.75" fill="rgba(123,94,167,0.7)"/></svg>
+      Données traitées conformément au RGPD. Jamais revendues. Désinscription possible à tout moment.
     </div>
-
-    <div class="cb-wrap">
+    <div class="cbw">
       <input type="checkbox" id="optin" checked>
-      <label for="optin" class="cb-label">J'accepte de recevoir des informations commerciales de Karafun Business par email et téléphone.</label>
+      <label for="optin" class="cbl">J'accepte de recevoir des informations commerciales de Karafun Business.</label>
     </div>
-    <span class="err" id="err-optin">Veuillez cocher cette case pour continuer</span>
+    <span class="err" id="e-optin">Veuillez cocher cette case</span>
 
-    <div class="btn-row">
-      <button class="btn btn-ghost" onclick="go(2)">← Retour</button>
+    <div class="br">
+      <button class="btn btn-g" onclick="go(2)">← Retour</button>
       <button class="btn" onclick="submit()">Recevoir mon analyse →</button>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════
-       STEP 4 — Résultats
-  ══════════════════════════════════ -->
-  <div class="kf-step" id="step4">
-    <div id="loading" class="sending">
+  <!-- ÉTAPE 4 — Résultats -->
+  <div class="step" id="s4">
+    <div id="loading" class="spin-wrap">
       <div class="spinner"></div>
       <div style="font-size:15px;font-weight:500;margin-bottom:6px;">Génération de votre rapport…</div>
-      <div style="font-size:13px;color:var(--kf-muted);">Calcul du ROI et envoi par email en cours</div>
+      <div id="load-msg" style="font-size:12px;color:var(--muted);">Calcul du ROI en cours…</div>
     </div>
-    <div id="results"></div>
+    <div id="res"></div>
   </div>
 
 </div>
-
-<div class="kf-footer">
-  &copy; 2025 Karafun Business — <a href="https://business.karafun.com/fr/" target="_blank">business.karafun.com/fr/</a>
-</div>
+<footer>&copy; 2025 Karafun Business — <a href="https://business.karafun.com/fr/" target="_blank">business.karafun.com</a></footer>
 
 <script>
-  let cur = 1;
+  // ⚠️ REMPLACEZ PAR VOTRE ID FORMSPREE
+  // Créez un compte gratuit sur formspree.io → New Form → copiez l'ID (ex: xpwzgkla)
+  var FORMSPREE_ID = 'VOTRE_ID_FORMSPREE';
 
-  // Sliders
-  document.getElementById('nb-boxes').oninput = function() {
-    const n = parseInt(this.value);
-    document.getElementById('nb-val').textContent = n + (n > 1 ? ' boxes' : ' box');
-    const sub = n * 199;
-    document.getElementById('kf-sub').value = sub;
-    document.getElementById('kf-sub-label').textContent = '199 € × ' + n + ' box' + (n > 1 ? 'es' : '') + ' = ' + sub.toLocaleString('fr-FR') + ' €/mois';
+  var cur = 1;
+
+  document.getElementById('nb').oninput = function() {
+    var n = parseInt(this.value);
+    document.getElementById('nb-v').textContent = n + (n > 1 ? ' boxes' : ' box');
+    var sub = n * 199;
+    document.getElementById('kfsub').value = sub;
+    document.getElementById('kfsub-hint').textContent = '199 € × ' + n + ' box' + (n > 1 ? 'es' : '') + ' = ' + sub.toLocaleString('fr-FR') + ' €/mois';
   };
-  document.getElementById('occ-rate').oninput = function() {
-    document.getElementById('occ-val').textContent = this.value + '%';
+  document.getElementById('occ').oninput = function() {
+    document.getElementById('occ-v').textContent = this.value + '%';
   };
 
   function go(n) {
-    document.getElementById('step' + cur).classList.remove('active');
+    document.getElementById('s' + cur).classList.remove('on');
     cur = n;
-    document.getElementById('step' + n).classList.add('active');
+    document.getElementById('s' + n).classList.add('on');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -657,291 +364,194 @@
   }
 
   function calc() {
-    const nbBoxes = v('nb-boxes');
-    const occRate = v('occ-rate') / 100;
-    const hoursDay = v('hours-day');
-    const daysWeek = v('days-week');
-    const pctWeek = v('pct-week') / 100;
-    const priceWeek = v('price-week');
-    const priceWknd = v('price-wknd');
-    const sessionDur = v('session-dur') || 1;
-
-    const weekdays = Math.min(daysWeek, 5);
-    const wkndDays = Math.max(0, daysWeek - 5);
-    const totalDaysYear = weekdays * 52 + wkndDays * 52;
-    const avgPrice = priceWeek * pctWeek + priceWknd * (1 - pctWeek);
-    const sessionsPerDay = (hoursDay / sessionDur) * occRate;
-    const revenueBoxYear = sessionsPerDay * avgPrice * sessionDur * totalDaysYear;
-    const totalRevYear = revenueBoxYear * nbBoxes;
-    const totalRevMonth = totalRevYear / 12;
-
-    const totalInvest = (v('inv-box') + v('inv-mat')) * nbBoxes + v('inv-struct');
-    const amortYears = v('amort-years') || 5;
-    const amortMonth = totalInvest / (amortYears * 12);
-
-    const fixed = v('rent') + v('charges-loc') + v('salaries') + v('kf-sub');
-    const variable = v('energy') + v('insurance') + v('accounting') + v('marketing') + v('maintenance') + v('misc');
-    const totalChargesMonth = fixed + variable + amortMonth;
-
-    const resultMonth = totalRevMonth - totalChargesMonth;
-    const resultYear = resultMonth * 12;
-    const roiPct = totalInvest > 0 ? (resultYear / totalInvest) * 100 : 0;
-    const paybackMonths = resultMonth > 0 ? totalInvest / resultMonth : Infinity;
-    const marginPct = totalRevMonth > 0 ? (resultMonth / totalRevMonth) * 100 : 0;
-
+    var nb = v('nb'), occ = v('occ') / 100, hpd = v('hpd'), dpw = v('dpw');
+    var pw2 = v('pw'), pwe = v('pwe'), dur = v('dur') || 1;
+    var wd = Math.min(dpw, 5), we = Math.max(0, dpw - 5);
+    var days = (wd + we) * 52;
+    var pct = wd / dpw;
+    var avgP = pw2 * pct + pwe * (1 - pct);
+    var spd = (hpd / dur) * occ;
+    var revY = spd * avgP * dur * days * nb;
+    var revM = revY / 12;
+    var invest = (v('ibox') + v('imat')) * nb + v('istr');
+    var amortM = invest / ((v('amort') || 5) * 12);
+    var fixed = v('rent') + v('cloc') + v('sal') + v('kfsub');
+    var varC = v('energy') + v('insur') + v('acct') + v('mktg') + v('maint') + v('misc');
+    var charges = fixed + varC + amortM;
+    var net = revM - charges;
+    var roi = invest > 0 ? (net * 12 / invest) * 100 : 0;
+    var pbk = net > 0 ? invest / net : Infinity;
+    var margin = revM > 0 ? (net / revM) * 100 : 0;
     return {
-      nbBoxes, totalInvest, totalRevMonth, totalRevYear,
-      fixed, variable, amortMonth, totalChargesMonth,
-      resultMonth, resultYear, roiPct, paybackMonths,
-      paybackYears: paybackMonths / 12, marginPct,
-      d: {
-        loyer: v('rent'), charges: v('charges-loc'), salaires: v('salaries'),
-        kf: v('kf-sub'), energie: v('energy'), assurance: v('insurance'),
-        compta: v('accounting'), marketing: v('marketing'),
-        maintenance: v('maintenance'), divers: v('misc'), amortMonth
-      }
+      nb, invest, revM, charges, net, roi, pbk, pbkY: pbk / 12, margin,
+      d: { rent: v('rent'), cloc: v('cloc'), sal: v('sal'), kf: v('kfsub'), energy: v('energy'), insur: v('insur'), acct: v('acct'), mktg: v('mktg'), maint: v('maint'), misc: v('misc'), amortM }
     };
   }
 
   function validate() {
-    let ok = true;
-    const name = document.getElementById('lead-name').value.trim();
-    const email = document.getElementById('lead-email').value.trim();
-    const phone = document.getElementById('lead-phone').value.trim();
-    const optin = document.getElementById('optin').checked;
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    document.getElementById('err-name').style.display = name ? 'none' : 'block';
-    document.getElementById('err-email').style.display = re.test(email) ? 'none' : 'block';
-    document.getElementById('err-phone').style.display = phone ? 'none' : 'block';
-    document.getElementById('err-optin').style.display = optin ? 'none' : 'block';
-
-    if (!name || !re.test(email) || !phone || !optin) ok = false;
+    var name = document.getElementById('lname').value.trim();
+    var email = document.getElementById('lemail').value.trim();
+    var phone = document.getElementById('lphone').value.trim();
+    var optin = document.getElementById('optin').checked;
+    var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    var ok = true;
+    document.getElementById('e-name').style.display = name ? 'none' : 'block'; if (!name) ok = false;
+    document.getElementById('e-email').style.display = re.test(email) ? 'none' : 'block'; if (!re.test(email)) ok = false;
+    document.getElementById('e-phone').style.display = phone ? 'none' : 'block'; if (!phone) ok = false;
+    document.getElementById('e-optin').style.display = optin ? 'none' : 'block'; if (!optin) ok = false;
     return ok;
   }
 
-  // ⚠️ REMPLACEZ LES VALEURS CI-DESSOUS PAR VOS CLÉS API
-  const HUBSPOT_API_KEY = 'VOTRE_CLE_HUBSPOT_ICI';
-  async function searchCompetitors(city, radiusMeters) {
-    try {
-      const res = await fetch('/api/places.cjs', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ city: city, radius: radiusMeters, country: 'France' })
-      });
-      const data = await res.json();
-      if (data.error || !data.city) return null;
-      return data;
-    } catch(e) {
-      console.warn('Places function error:', e);
-      return null;
-    }
+  function lvl(n) {
+    if (n === 0) return { label: 'Aucune concurrence détectée', color: '#5DE8A6' };
+    if (n <= 2) return { label: 'Faible concurrence', color: '#5DE8A6' };
+    if (n <= 5) return { label: 'Concurrence modérée', color: '#FFD166' };
+    return { label: 'Forte concurrence', color: '#FF6B6B' };
   }
 
-  function competitionLevel(count) {
-    if (count === 0) return { label: 'Aucune concurrence détectée', color: '#5DE8A6', score: 'excellent' };
-    if (count <= 2) return { label: 'Faible concurrence', color: '#5DE8A6', score: 'bon' };
-    if (count <= 5) return { label: 'Concurrence modérée', color: '#FFD166', score: 'moyen' };
-    return { label: 'Forte concurrence', color: '#FF6B6B', score: 'élevé' };
+  function buildCmpBlock(cmp, radius) {
+    var l = lvl(cmp.count);
+    var km = Math.round(radius / 1000);
+    var h = '<div class="sh" style="margin-top:0;">Marché local — ' + cmp.city + '</div>';
+    h += '<div class="cmpbox">';
+    h += '<div class="cmprow"><span class="cn">Concurrents dans ' + km + 'km</span><span style="font-weight:600;color:' + l.color + ';">' + cmp.count + ' établissement' + (cmp.count > 1 ? 's' : '') + '</span></div>';
+    h += '<div class="cmprow"><span class="cn">Niveau de concurrence</span><span style="font-weight:600;color:' + l.color + ';">' + l.label + '</span></div>';
+    if (parseFloat(cmp.avgRating) > 0) {
+      h += '<div class="cmprow"><span class="cn">Note moyenne concurrents</span><span style="font-weight:600;">⭐ ' + cmp.avgRating + '/5</span></div>';
+    }
+    if (cmp.competitors && cmp.competitors.length > 0) {
+      cmp.competitors.slice(0, 5).forEach(function(c) {
+        h += '<div class="cmprow"><span style="color:var(--text);">' + c.name + '</span><span style="color:var(--muted);">' + (c.rating ? '⭐ ' + c.rating : '—') + '</span></div>';
+      });
+    }
+    h += '</div>';
+    return h;
   }
 
   async function submit() {
     if (!validate()) return;
     go(4);
 
-    const r = calc();
-    const name = document.getElementById('lead-name').value.trim();
-    const email = document.getElementById('lead-email').value.trim();
-    const phone = document.getElementById('lead-phone').value.trim();
-    const stageEl = document.getElementById('lead-stage');
-    const stage = stageEl.options[stageEl.selectedIndex].text;
-    const firstName = name.split(' ')[0];
-    const lastName = name.split(' ').slice(1).join(' ') || '';
-    const city = document.getElementById('city').value.trim();
-    const radius = document.getElementById('radius').value;
+    var r = calc();
+    var name = document.getElementById('lname').value.trim();
+    var email = document.getElementById('lemail').value.trim();
+    var phone = document.getElementById('lphone').value.trim();
+    var stageEl = document.getElementById('lstage');
+    var stage = stageEl.options[stageEl.selectedIndex].text;
+    var city = document.getElementById('city').value.trim();
+    var radius = parseInt(document.getElementById('radius').value);
 
-    // 0. Recherche concurrents Google Places
-    document.getElementById('loading').querySelector('div:last-child').textContent = 'Analyse du marché local en cours…';
-    const competition = city ? await searchCompetitors(city, radius) : null;
+    // 1. Analyse concurrence
+    document.getElementById('load-msg').textContent = 'Analyse du marché local…';
+    var cmp = null;
+    if (city) {
+      try {
+        var cmpRes = await fetch('/api/places', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ city: city, radius: radius })
+        });
+        var cmpData = await cmpRes.json();
+        if (!cmpData.error) cmp = cmpData;
+      } catch(e) { cmp = null; }
+    }
 
-    // 1. Générer l'analyse IA
-    const prompt = `Tu es un expert en business karaoké pour Karafun Business. Génère une analyse personnalisée courte (4-5 paragraphes) en français pour ${name}, porteur d'un projet de ${r.nbBoxes} box(es) karaoké.
+    // 2. Analyse IA
+    document.getElementById('load-msg').textContent = 'Génération de l\'analyse IA…';
+    var cmpCtx = cmp ? '\n- Ville : ' + cmp.city + '\n- Concurrents détectés (' + Math.round(radius/1000) + 'km) : ' + cmp.count + '\n- Note moy. concurrents : ' + cmp.avgRating + '/5\n- Niveau concurrence : ' + lvl(cmp.count).label : '';
+    var prompt = 'Tu es un expert en business karaoké pour Karafun Business. Génère une analyse personnalisée courte (4-5 paragraphes) en français pour ' + name + ', porteur d\'un projet de ' + r.nb + ' box(es) karaoké.\n\nDonnées :\n- Investissement : ' + fmt(r.invest) + '\n- CA mensuel : ' + fmt(r.revM) + '\n- Charges : ' + fmt(r.charges) + '\n- Résultat net/mois : ' + fmt(r.net) + '\n- ROI annuel : ' + r.roi.toFixed(1) + '%\n- Retour invest. : ' + (isFinite(r.pbk) && r.pbk > 0 ? r.pbkY.toFixed(1) + ' ans' : 'modèle à revoir') + '\n- Stade : ' + stage + cmpCtx + '\n\nTon : professionnel, chaleureux, direct. Pas de liste à puces. Uniquement du texte.';
 
-Données de la simulation :
-- Investissement total : ${Math.round(r.totalInvest).toLocaleString('fr-FR')} €
-- CA mensuel estimé : ${Math.round(r.totalRevMonth).toLocaleString('fr-FR')} €
-- Charges mensuelles : ${Math.round(r.totalChargesMonth).toLocaleString('fr-FR')} €
-- Résultat net mensuel : ${Math.round(r.resultMonth).toLocaleString('fr-FR')} €
-- ROI annuel : ${r.roiPct.toFixed(1)}%
-- Retour sur investissement : ${isFinite(r.paybackMonths) && r.paybackMonths > 0 ? r.paybackYears.toFixed(1) + ' ans' : 'modèle à revoir'}
-- Stade : ${stage}
-
-L'analyse doit :
-1. Commencer par une phrase d'accroche motivante adaptée au niveau de ROI
-2. Identifier 2 points forts du modèle
-3. Donner 1-2 axes d'optimisation concrets
-4. Conclure en invitant à contacter Karafun Business (business.karafun.com/fr/)
-Ton : professionnel, chaleureux, direct. Pas de liste à puces. Uniquement du texte.`;
-
-    let analysis = null;
+    var analysis = null;
     try {
-      const aiRes = await fetch('https://api.anthropic.com/v1/messages', {
+      var aiRes = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          messages: [{ role: 'user', content: prompt }]
-        })
+        body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: [{ role: 'user', content: prompt }] })
       });
-      const aiData = await aiRes.json();
+      var aiData = await aiRes.json();
       analysis = aiData.content && aiData.content[0] ? aiData.content[0].text : null;
     } catch(e) { analysis = null; }
 
-    // 2. Créer le contact dans HubSpot via Netlify Function
+    // 3. Envoi Formspree
+    document.getElementById('load-msg').textContent = 'Envoi du rapport…';
     try {
-      await fetch('/api/hubspot.cjs', {
+      await fetch('https://formspree.io/f/' + FORMSPREE_ID, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          firstName, lastName, email, phone, stage, city: city || '',
-          nbBoxes: r.nbBoxes,
-          roiPct: r.roiPct.toFixed(1),
-          totalInvest: Math.round(r.totalInvest),
-          totalRevMonth: Math.round(r.totalRevMonth),
-          totalChargesMonth: Math.round(r.totalChargesMonth),
-          resultMonth: Math.round(r.resultMonth),
-          payback: isFinite(r.paybackMonths) && r.paybackMonths > 0 ? r.paybackYears.toFixed(1) + ' ans' : 'N/A'
+          nom: name, email: email, telephone: phone,
+          stade: stage, ville: city || 'Non renseignée',
+          nb_boxes: r.nb,
+          roi_annuel: r.roi.toFixed(1) + '%',
+          ca_mensuel: fmt(r.revM),
+          resultat_net: fmt(r.net),
+          investissement: fmt(r.invest),
+          charges: fmt(r.charges),
+          retour_invest: isFinite(r.pbk) && r.pbk > 0 ? r.pbkY.toFixed(1) + ' ans' : 'N/A',
+          nb_concurrents: cmp ? cmp.count : 'N/A',
+          niveau_concurrence: cmp ? lvl(cmp.count).label : 'N/A'
         })
       });
-    } catch(e) { console.warn('HubSpot sync error:', e); }
+    } catch(e) { }
 
-    // 3. Envoyer les données à Netlify Forms
-    try {
-      const formData = new FormData();
-      formData.append('form-name', 'simulation-roi');
-      formData.append('nom', name);
-      formData.append('email', email);
-      formData.append('telephone', phone);
-      formData.append('stade_projet', stage);
-      formData.append('nb_boxes', String(r.nbBoxes));
-      formData.append('roi_annuel', r.roiPct.toFixed(1) + '%');
-      formData.append('ca_mensuel', Math.round(r.totalRevMonth).toLocaleString('fr-FR') + ' €');
-      formData.append('resultat_net_mensuel', Math.round(r.resultMonth).toLocaleString('fr-FR') + ' €');
-      formData.append('investissement_total', Math.round(r.totalInvest).toLocaleString('fr-FR') + ' €');
-      formData.append('charges_mensuelles', Math.round(r.totalChargesMonth).toLocaleString('fr-FR') + ' €');
-      formData.append('delai_retour_invest', isFinite(r.paybackMonths) && r.paybackMonths > 0 ? r.paybackYears.toFixed(1) + ' ans' : 'N/A');
-      await fetch('/', { method: 'POST', body: formData });
-    } catch(e) { console.warn('Netlify Forms error:', e); }
-
-    renderResults(r, name, email, analysis, competition, parseInt(radius));
+    renderResults(r, name, email, analysis, cmp, radius);
   }
 
-  function buildCompetitionBlock(competition, radius) {
-    const lvl = competitionLevel(competition.count);
-    const km = Math.round(radius / 1000);
-    let html = '<div class="sh" style="margin-top:0;">Analyse du marché local — ' + competition.city + '</div>';
-    html += '<div style="background:var(--kf-card);border:1px solid var(--kf-border);border-radius:12px;padding:14px 16px;margin-bottom:14px;">';
-    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">';
-    html += '<span style="font-size:12px;color:var(--kf-muted);">Concurrents karaoké dans ' + km + 'km</span>';
-    html += '<span style="font-size:14px;font-weight:600;color:' + lvl.color + ';">' + competition.count + ' établissement' + (competition.count > 1 ? 's' : '') + '</span></div>';
-    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">';
-    html += '<span style="font-size:12px;color:var(--kf-muted);">Niveau de concurrence</span>';
-    html += '<span style="font-size:13px;font-weight:600;color:' + lvl.color + ';">' + lvl.label + '</span></div>';
-    if (competition.avgRating > 0) {
-      html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:' + (competition.competitors.length > 0 ? '10px' : '0') + ';">';
-      html += '<span style="font-size:12px;color:var(--kf-muted);">Note moyenne concurrents</span>';
-      html += '<span style="font-size:13px;font-weight:600;color:var(--kf-text);">⭐ ' + competition.avgRating + '/5</span></div>';
-    }
-    if (competition.competitors.length > 0) {
-      html += '<div style="border-top:1px solid var(--kf-border);padding-top:10px;margin-top:2px;">';
-      html += '<div style="font-size:10px;color:var(--kf-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Établissements détectés</div>';
-      competition.competitors.slice(0, 5).forEach(function(c) {
-        html += '<div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);">';
-        html += '<span style="color:var(--kf-text);flex:1;margin-right:8px;">' + c.name + '</span>';
-        html += '<span style="color:var(--kf-muted);flex-shrink:0;">' + (c.rating ? '⭐ ' + c.rating : '—') + '</span></div>';
-      });
-      html += '</div>';
-    }
-    html += '</div>';
-    return html;
-  }
-
-  function renderResults(r, name, email, analysis, competition, radius) {
+  function renderResults(r, name, email, analysis, cmp, radius) {
     document.getElementById('loading').style.display = 'none';
-    const netClass = r.resultMonth >= 0 ? 'pos' : 'neg';
-    const marginClass = r.marginPct >= 0 ? 'pos' : 'neg';
+    var nc = r.net >= 0 ? 'pos' : 'neg';
+    var mc = r.margin >= 0 ? 'pos' : 'neg';
+    var fn = name.split(' ')[0];
 
-    document.getElementById('results').innerHTML = `
-      <div style="padding:0 0 8px;">
-        <div style="text-align:center;padding:24px 32px 8px;">
-          <div class="success-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M5 13l4 4L19 7" stroke="#5DE8A6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:6px;">Analyse générée, ${name.split(' ')[0]} !</div>
-          <div style="font-size:13px;color:var(--kf-muted);">Résultats affichés ci-dessous · Rapport envoyé à <strong style="color:var(--kf-accent);">${email}</strong></div>
-        </div>
+    var html = '<div style="padding:0 0 8px;">';
+    html += '<div style="text-align:center;padding:20px 28px 8px;">';
+    html += '<div class="okico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#5DE8A6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
+    html += '<div style="font-family:\'Playfair Display\',serif;font-size:19px;font-weight:700;margin-bottom:5px;">Analyse prête, ' + fn + ' !</div>';
+    html += '<div style="font-size:12px;color:var(--muted);">Rapport envoyé à <strong style="color:var(--accent);">' + email + '</strong></div>';
+    html += '</div>';
+    html += '<div style="padding:0 28px;">';
 
-        <div style="padding:0 32px;">
-          <div class="results-hero">
-            <div class="roi-badge-label">Retour sur investissement annuel</div>
-            <div class="roi-badge">${r.roiPct.toFixed(1)}%</div>
-            <div class="roi-sub">
-              ${r.nbBoxes} box${r.nbBoxes > 1 ? 'es' : ''} &nbsp;·&nbsp; Investissement ${fmt(r.totalInvest)}
-              ${isFinite(r.paybackMonths) && r.paybackMonths > 0 ? `<br>Remboursement en <strong style="color:#5DE8A6;">${r.paybackYears.toFixed(1)} ans</strong>` : ''}
-            </div>
-          </div>
+    html += '<div class="hero">';
+    html += '<div class="roi-lbl">Retour sur investissement annuel</div>';
+    html += '<div class="roi-num">' + r.roi.toFixed(1) + '%</div>';
+    html += '<div class="roi-sub">' + r.nb + ' box' + (r.nb > 1 ? 'es' : '') + ' &nbsp;·&nbsp; ' + fmt(r.invest);
+    if (isFinite(r.pbk) && r.pbk > 0) html += '<br>Remboursement en <strong style="color:#5DE8A6;">' + r.pbkY.toFixed(1) + ' ans</strong>';
+    html += '</div></div>';
 
-          <div class="metrics">
-            <div class="metric">
-              <div class="metric-label">CA mensuel</div>
-              <div class="metric-val acc">${fmt(r.totalRevMonth)}</div>
-            </div>
-            <div class="metric">
-              <div class="metric-label">Charges/mois</div>
-              <div class="metric-val">${fmt(r.totalChargesMonth)}</div>
-            </div>
-            <div class="metric">
-              <div class="metric-label">Résultat net/mois</div>
-              <div class="metric-val ${netClass}">${fmt(r.resultMonth)}</div>
-            </div>
-            <div class="metric">
-              <div class="metric-label">Marge nette</div>
-              <div class="metric-val ${marginClass}">${r.marginPct.toFixed(1)}%</div>
-            </div>
-          </div>
+    html += '<div class="mets">';
+    html += '<div class="met"><div class="met-l">CA mensuel</div><div class="met-v acc">' + fmt(r.revM) + '</div></div>';
+    html += '<div class="met"><div class="met-l">Charges/mois</div><div class="met-v">' + fmt(r.charges) + '</div></div>';
+    html += '<div class="met"><div class="met-l">Résultat net/mois</div><div class="met-v ' + nc + '">' + fmt(r.net) + '</div></div>';
+    html += '<div class="met"><div class="met-l">Marge nette</div><div class="met-v ' + mc + '">' + r.margin.toFixed(1) + '%</div></div>';
+    html += '</div>';
 
-          <div class="sh">Détail des charges mensuelles</div>
-          <div class="charges-table">
-            <div class="charge-row"><span class="charge-name">Loyer &amp; charges locatives</span><span>${fmt(r.d.loyer + r.d.charges)}</span></div>
-            <div class="charge-row"><span class="charge-name">Masse salariale</span><span>${fmt(r.d.salaires)}</span></div>
-            <div class="charge-row"><span class="charge-name">Abonnement Karafun Business</span><span>${fmt(r.d.kf)}</span></div>
-            <div class="charge-row"><span class="charge-name">Énergie</span><span>${fmt(r.d.energie)}</span></div>
-            <div class="charge-row"><span class="charge-name">Assurance</span><span>${fmt(r.d.assurance)}</span></div>
-            <div class="charge-row"><span class="charge-name">Comptabilité</span><span>${fmt(r.d.compta)}</span></div>
-            <div class="charge-row"><span class="charge-name">Marketing</span><span>${fmt(r.d.marketing)}</span></div>
-            <div class="charge-row"><span class="charge-name">Maintenance &amp; divers</span><span>${fmt(r.d.maintenance + r.d.divers)}</span></div>
-            <div class="charge-row"><span class="charge-name">Amortissement</span><span>${fmt(r.d.amortMonth)}</span></div>
-            <div class="charge-row total"><span>Total mensuel</span><span>${fmt(r.totalChargesMonth)}</span></div>
-          </div>
+    html += '<div class="sh">Détail des charges</div>';
+    html += '<div class="ctab">';
+    html += '<div class="crow"><span class="cn">Loyer &amp; charges</span><span>' + fmt(r.d.rent + r.d.cloc) + '</span></div>';
+    html += '<div class="crow"><span class="cn">Masse salariale</span><span>' + fmt(r.d.sal) + '</span></div>';
+    html += '<div class="crow"><span class="cn">Abonnement Karafun</span><span>' + fmt(r.d.kf) + '</span></div>';
+    html += '<div class="crow"><span class="cn">Énergie</span><span>' + fmt(r.d.energy) + '</span></div>';
+    html += '<div class="crow"><span class="cn">Assurance</span><span>' + fmt(r.d.insur) + '</span></div>';
+    html += '<div class="crow"><span class="cn">Comptabilité</span><span>' + fmt(r.d.acct) + '</span></div>';
+    html += '<div class="crow"><span class="cn">Marketing</span><span>' + fmt(r.d.mktg) + '</span></div>';
+    html += '<div class="crow"><span class="cn">Maintenance &amp; divers</span><span>' + fmt(r.d.maint + r.d.misc) + '</span></div>';
+    html += '<div class="crow"><span class="cn">Amortissement</span><span>' + fmt(r.d.amortM) + '</span></div>';
+    html += '<div class="crow tot"><span>Total mensuel</span><span>' + fmt(r.charges) + '</span></div>';
+    html += '</div>';
 
-          ${competition ? buildCompetitionBlock(competition, radius) : ''}
+    if (cmp) html += buildCmpBlock(cmp, radius);
 
-          ${analysis ? `
-          <div class="ai-box">
-            <div class="ai-box-title">✦ Analyse personnalisée Karafun Business</div>
-            <div class="ai-box-body">${analysis.replace(/\n/g, '<br>')}</div>
-          </div>` : ''}
+    if (analysis) {
+      html += '<div class="aibox"><div class="aibox-t">✦ Analyse personnalisée Karafun Business</div>';
+      html += '<div class="aibox-b">' + analysis.replace(/\n/g, '<br>') + '</div></div>';
+    }
 
-          <a href="https://meetings-eu1.hubspot.com/meetings/acaupert?uuid=e4041660-e0bf-43e9-9a08-b26ddd6ddaee" target="_blank" style="display:block;text-decoration:none;">
-            <button class="btn" style="margin-top:0;">Parler à un expert Karafun →</button>
-          </a>
-          <button class="btn btn-ghost" onclick="location.reload()">Lancer une nouvelle simulation</button>
-        </div>
-      </div>
-    `;
+    html += '<a href="https://meetings-eu1.hubspot.com/meetings/acaupert?uuid=e4041660-e0bf-43e9-9a08-b26ddd6ddaee" target="_blank" style="display:block;text-decoration:none;">';
+    html += '<button class="btn" style="margin-top:0;">Parler à un expert Karafun →</button></a>';
+    html += '<button class="btn btn-g" onclick="location.reload()">Nouvelle simulation</button>';
+    html += '</div></div>';
+
+    document.getElementById('res').innerHTML = html;
   }
 </script>
 </body>
