@@ -403,27 +403,24 @@
   }
 
   function lvl(n) {
-    if (n === 0) return { label: 'Aucune concurrence détectée', color: '#5DE8A6' };
-    if (n <= 2) return { label: 'Faible concurrence', color: '#5DE8A6' };
-    if (n <= 5) return { label: 'Concurrence modérée', color: '#FFD166' };
-    return { label: 'Forte concurrence', color: '#FF6B6B' };
+    if (n === 0) return { label: 'Aucune concurrence détectée', color: '#5DE8A6', text: 'Excellente opportunité : aucune box de karaoké privative n'a été détectée dans cette zone. Vous seriez le premier acteur sur ce marché, avec un potentiel de captation maximal de la demande locale.' };
+    if (n === 1) return { label: 'Très faible concurrence', color: '#5DE8A6', text: 'Zone très favorable : un seul concurrent direct a été détecté dans la zone. Le marché est encore largement ouvert et la demande non satisfaite est probablement importante.' };
+    if (n <= 3) return { label: 'Faible concurrence', color: '#5DE8A6', text: 'Zone favorable : peu de boxes de karaoké sont présentes dans la zone. Le marché reste accessible et une offre de qualité peut facilement se démarquer.' };
+    if (n <= 6) return { label: 'Concurrence modérée', color: '#FFD166', text: 'Zone à potentiel : plusieurs acteurs sont déjà présents. Une différenciation par la qualité, le prix ou l'expérience client sera essentielle pour capter des parts de marché.' };
+    return { label: 'Marché concurrentiel', color: '#FF6B6B', text: 'Zone saturée : de nombreuses boxes de karaoké sont déjà présentes. Le projet nécessite une analyse approfondie du positionnement et une offre très différenciante pour réussir.' };
   }
 
   function buildCmpBlock(cmp, radius) {
     var l = lvl(cmp.count);
     var km = Math.round(radius / 1000);
-    var h = '<div class="sh" style="margin-top:0;">Marché local — ' + cmp.city + '</div>';
+    var h = '<div class="sh" style="margin-top:0;">Analyse du marché — ' + cmp.city + '</div>';
     h += '<div class="cmpbox">';
-    h += '<div class="cmprow"><span class="cn">Concurrents dans ' + km + 'km</span><span style="font-weight:600;color:' + l.color + ';">' + cmp.count + ' établissement' + (cmp.count > 1 ? 's' : '') + '</span></div>';
+    h += '<div class="cmprow"><span class="cn">Boxes karaoké détectées dans ' + km + ' km</span><span style="font-weight:600;color:' + l.color + ';">' + cmp.count + '</span></div>';
     h += '<div class="cmprow"><span class="cn">Niveau de concurrence</span><span style="font-weight:600;color:' + l.color + ';">' + l.label + '</span></div>';
     if (parseFloat(cmp.avgRating) > 0) {
-      h += '<div class="cmprow"><span class="cn">Note moyenne concurrents</span><span style="font-weight:600;">⭐ ' + cmp.avgRating + '/5</span></div>';
+      h += '<div class="cmprow"><span class="cn">Note moyenne des concurrents</span><span style="font-weight:600;">⭐ ' + cmp.avgRating + '/5</span></div>';
     }
-    if (cmp.competitors && cmp.competitors.length > 0) {
-      cmp.competitors.slice(0, 5).forEach(function(c) {
-        h += '<div class="cmprow"><span style="color:var(--text);">' + c.name + '</span><span style="color:var(--muted);">' + (c.rating ? '⭐ ' + c.rating : '—') + '</span></div>';
-      });
-    }
+    h += '<div style="padding:12px 14px;font-size:12px;color:var(--muted);line-height:1.7;border-top:1px solid var(--border);">' + l.text + '</div>';
     h += '</div>';
     return h;
   }
@@ -441,7 +438,7 @@
     var city = document.getElementById('city').value.trim();
     var radius = parseInt(document.getElementById('radius').value);
 
-    // 1. Analyse concurrence
+    // 1. Analyse du marché local (données socio-économiques)
     document.getElementById('load-msg').textContent = 'Analyse du marché local…';
     var cmp = null;
     if (city) {
@@ -449,7 +446,7 @@
         var cmpRes = await fetch('/api/places', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ city: city, radius: radius })
+          body: JSON.stringify({ city: city })
         });
         var cmpData = await cmpRes.json();
         if (!cmpData.error) cmp = cmpData;
@@ -458,7 +455,7 @@
 
     // 2. Analyse IA via Vercel Function
     document.getElementById('load-msg').textContent = 'Génération de l\'analyse IA…';
-    var cmpCtx = cmp ? '\n- Ville : ' + cmp.city + '\n- Concurrents détectés (' + Math.round(radius/1000) + 'km) : ' + cmp.count + '\n- Note moy. concurrents : ' + cmp.avgRating + '/5\n- Niveau concurrence : ' + lvl(cmp.count).label : '';
+    var cmpCtx = cmp && cmp.score ? '\n- Ville : ' + cmp.city + '\n- Population : ' + (cmp.pop/1000).toFixed(0) + ' 000 habitants\n- Revenu médian : ' + (cmp.revenu || 0).toLocaleString(\'fr-FR\') + ' €/an\n- Part de jeunes : ' + cmp.jeunes + '%\n- Tourisme : ' + cmp.tourisme + '\n- Potentiel marché : ' + cmp.potential : '';
     var prompt = 'Tu es un expert en business karaoké pour Karafun Business. Génère une analyse personnalisée courte (4-5 paragraphes) en français pour ' + name + ', porteur d\'un projet de ' + r.nb + ' box(es) karaoké.\n\nDonnées :\n- Investissement : ' + fmt(r.invest) + '\n- CA mensuel : ' + fmt(r.revM) + '\n- Charges : ' + fmt(r.charges) + '\n- Résultat net/mois : ' + fmt(r.net) + '\n- ROI annuel : ' + r.roi.toFixed(1) + '%\n- Retour invest. : ' + (isFinite(r.pbk) && r.pbk > 0 ? r.pbkY.toFixed(1) + ' ans' : 'modèle à revoir') + '\n- Stade : ' + stage + cmpCtx + '\n\nTon : professionnel, chaleureux, direct. Pas de liste à puces. Uniquement du texte.';
 
     var analysis = null;
@@ -539,7 +536,7 @@
     html += '<div class="crow tot"><span>Total mensuel</span><span>' + fmt(r.charges) + '</span></div>';
     html += '</div>';
 
-    if (cmp) html += buildCmpBlock(cmp, radius);
+    if (cmp && cmp.potential) html += buildCmpBlock(cmp, radius);
 
     if (analysis) {
       html += '<div class="aibox"><div class="aibox-t">✦ Analyse personnalisée Karafun Business</div>';
