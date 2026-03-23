@@ -34,7 +34,11 @@ module.exports = async function(req, res) {
       'https://maps.googleapis.com/maps/api/geocode/json?address='
       + encodeURIComponent(city + ', ' + country) + '&key=' + KEY
     );
-    if (!geoData.results || !geoData.results[0]) return res.json({ count: 0, competitors: [], avgRating: '0', city: city });
+
+    // Debug: return raw geo response
+    if (!geoData.results || !geoData.results[0]) {
+      return res.json({ debug: true, geoStatus: geoData.status, geoError: geoData.error_message || 'no results', count: 0, competitors: [], avgRating: '0', city: city });
+    }
 
     var loc = geoData.results[0].geometry.location;
     var comps = geoData.results[0].address_components || [];
@@ -50,6 +54,7 @@ module.exports = async function(req, res) {
       + '&keyword=karaoke+karaoké&type=establishment&key=' + KEY
     );
 
+    // Debug: return places status
     var results = (placesData.results || []).slice(0, 10);
     var competitors = results.map(function(p) {
       return { name: p.name, rating: p.rating || null, vicinity: p.vicinity || '' };
@@ -59,7 +64,13 @@ module.exports = async function(req, res) {
       ? (rated.reduce(function(a, c) { return a + c.rating; }, 0) / rated.length).toFixed(1)
       : '0';
 
-    return res.json({ count: competitors.length, competitors: competitors, avgRating: avgRating, city: cityName });
+    return res.json({
+      count: competitors.length,
+      competitors: competitors,
+      avgRating: avgRating,
+      city: cityName,
+      placesStatus: placesData.status
+    });
   } catch(e) {
     return res.status(500).json({ error: e.message });
   }
