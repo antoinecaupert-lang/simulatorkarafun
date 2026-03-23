@@ -455,7 +455,7 @@
 
     // 2. Analyse IA via Vercel Function
     document.getElementById('load-msg').textContent = 'Génération de l\'analyse IA…';
-    var cmpCtx = cmp && cmp.score ? '\n- Ville : ' + cmp.city + '\n- Population : ' + (cmp.pop/1000).toFixed(0) + ' 000 habitants\n- Revenu médian : ' + (cmp.revenu || 0).toLocaleString(\'fr-FR\') + ' €/an\n- Part de jeunes : ' + cmp.jeunes + '%\n- Tourisme : ' + cmp.tourisme + '\n- Potentiel marché : ' + cmp.potential : '';
+    var cmpCtx = cmp && cmp.score ? '\n- Ville : ' + cmp.city + '\n- Population : ' + (cmp.pop/1000).toFixed(0) + ' 000 habitants\n- Revenu médian : ' + (cmp.revenu || 0).toLocaleString('fr-FR') + ' \u20ac/an\n- Part de jeunes : ' + cmp.jeunes + '%\n- Tourisme : ' + cmp.tourisme + '\n- Potentiel march\u00e9 : ' + cmp.potential : '';
     var prompt = 'Tu es un expert en business karaoké pour Karafun Business. Génère une analyse personnalisée courte (4-5 paragraphes) en français pour ' + name + ', porteur d\'un projet de ' + r.nb + ' box(es) karaoké.\n\nDonnées :\n- Investissement : ' + fmt(r.invest) + '\n- CA mensuel : ' + fmt(r.revM) + '\n- Charges : ' + fmt(r.charges) + '\n- Résultat net/mois : ' + fmt(r.net) + '\n- ROI annuel : ' + r.roi.toFixed(1) + '%\n- Retour invest. : ' + (isFinite(r.pbk) && r.pbk > 0 ? r.pbkY.toFixed(1) + ' ans' : 'modèle à revoir') + '\n- Stade : ' + stage + cmpCtx + '\n\nTon : professionnel, chaleureux, direct. Pas de liste à puces. Uniquement du texte.';
 
     var analysis = null;
