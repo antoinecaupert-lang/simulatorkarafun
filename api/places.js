@@ -50,13 +50,13 @@ module.exports = async function(req, res) {
       'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
       + '?location=' + loc.lat + ',' + loc.lng
       + '&radius=' + radius
-      + '&keyword=karaoké&key=' + KEY
+      + '&keyword=karaoké+box&key=' + KEY
     );
     var results2 = await get(
       'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
       + '?location=' + loc.lat + ',' + loc.lng
       + '&radius=' + radius
-      + '&keyword=karaoke+bar&key=' + KEY
+      + '&keyword=karaoke+box&key=' + KEY
     );
 
     // Fusionner et dédupliquer par place_id
