@@ -3,110 +3,97 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulateur ROI — Karafun Business</title>
+<title>Simulateur ROI Karafun Business</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --pink: #E8447A; --purple: #7B5EA7;
-    --grad: linear-gradient(135deg, #7B5EA7 0%, #E8447A 100%);
-    --dark: #0D0D0F; --card: #1E1E26;
-    --border: rgba(255,255,255,0.08);
-    --text: #F5F4FF; --muted: rgba(245,244,255,0.5);
-    --input: rgba(255,255,255,0.06); --accent: #FF6FA8;
-  }
-  html, body { min-height: 100vh; background: var(--dark); font-family: 'DM Sans', sans-serif; color: var(--text); }
-  body { display: flex; flex-direction: column; align-items: center; padding: 40px 16px 60px; }
-  body::before { content: ''; position: fixed; top: -150px; right: -150px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(123,94,167,0.18) 0%, transparent 65%); pointer-events: none; z-index: 0; }
-  body::after { content: ''; position: fixed; bottom: -100px; left: -100px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(232,68,122,0.12) 0%, transparent 65%); pointer-events: none; z-index: 0; }
-  #app { position: relative; z-index: 1; width: 100%; max-width: 640px; background: #17171C; border-radius: 20px; border: 1px solid var(--border); overflow: hidden; }
-  .hdr { padding: 24px 28px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 14px; }
-  .logo { width: 40px; height: 40px; flex-shrink: 0; }
-  .brand { flex: 1; }
-  .brand-name { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 900; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; }
-  .brand-sub { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
-  .tagline { font-size: 11px; color: var(--muted); text-align: right; max-width: 140px; line-height: 1.5; }
-  .step { display: none; padding: 24px 28px 28px; }
-  .step.on { display: block; }
-  .prog { display: flex; gap: 6px; margin-bottom: 20px; }
-  .dot { height: 3px; border-radius: 2px; flex: 1; background: var(--border); transition: background .3s; }
-  .dot.done, .dot.on { background: var(--pink); }
-  .ttl { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-  .sub { font-size: 12px; color: var(--muted); margin-bottom: 22px; }
-  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-  .g1 { display: grid; gap: 12px; }
-  .f { display: flex; flex-direction: column; gap: 5px; }
-  .lbl { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1.2px; }
-  .hint { font-size: 10px; color: rgba(245,244,255,0.3); }
-  input[type=text], input[type=number], input[type=email], input[type=tel], select {
-    background: var(--input); border: 1px solid var(--border); border-radius: 10px;
-    color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px;
-    padding: 11px 12px; width: 100%; outline: none;
-    transition: border-color .2s, background .2s; -webkit-appearance: none; appearance: none;
-  }
-  input:focus, select:focus { border-color: var(--pink); background: rgba(232,68,122,0.07); }
-  select option { background: #1E1E26; }
-  .pw { position: relative; }
-  .pw .pfx { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 13px; color: var(--muted); pointer-events: none; }
-  .pw input { padding-left: 26px; }
-  .pw .sfx { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 11px; color: var(--muted); pointer-events: none; }
-  .pw.rs input { padding-right: 40px; }
-  .sv { display: flex; flex-direction: column; gap: 6px; }
-  .sv-val { font-size: 17px; font-weight: 600; color: var(--accent); text-align: center; }
-  input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.12); outline: none; cursor: pointer; }
-  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--pink); cursor: pointer; box-shadow: 0 0 0 3px rgba(232,68,122,0.2); }
-  .sl { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); }
-  .sh { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin: 18px 0 12px; display: flex; align-items: center; gap: 8px; }
-  .sh::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-  .btn { width: 100%; padding: 13px; background: var(--grad); border: none; border-radius: 10px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 20px; transition: opacity .2s, transform .1s; }
-  .btn:hover { opacity: .88; }
-  .btn:active { transform: scale(.99); }
-  .btn-g { background: transparent; border: 1px solid var(--border); color: var(--muted); margin-top: 8px; }
-  .btn-g:hover { border-color: var(--pink); color: var(--text); opacity: 1; }
-  .br { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-  .br .btn, .br .btn-g { margin-top: 0; }
-  .lcard { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 18px; }
-  .lcard-t { font-size: 13px; font-weight: 600; margin-bottom: 6px; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-  .lcard-b { font-size: 12px; color: var(--muted); line-height: 1.6; }
-  .notice { background: rgba(123,94,167,0.12); border: 1px solid rgba(123,94,167,0.28); border-radius: 10px; padding: 12px 14px; font-size: 11px; color: var(--muted); line-height: 1.6; display: flex; gap: 8px; align-items: flex-start; margin-bottom: 14px; }
-  .cbw { display: flex; align-items: flex-start; gap: 10px; margin-top: 12px; }
-  input[type=checkbox] { width: 15px; height: 15px; accent-color: var(--pink); flex-shrink: 0; margin-top: 2px; }
-  .cbl { font-size: 11px; color: var(--muted); line-height: 1.5; }
-  .err { color: #FF6B6B; font-size: 11px; margin-top: 3px; display: none; }
-  .spin-wrap { text-align: center; padding: 50px 20px; }
-  .spinner { width: 40px; height: 40px; border-radius: 50%; border: 3px solid rgba(255,255,255,.08); border-top-color: var(--pink); animation: spin .8s linear infinite; margin: 0 auto 16px; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .hero { background: var(--card); border: 1px solid rgba(232,68,122,.28); border-radius: 16px; padding: 24px 18px; text-align: center; margin-bottom: 14px; }
-  .roi-num { display: inline-block; background: var(--grad); color: #fff; font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 900; line-height: 1; padding: 8px 24px; border-radius: 12px; margin: 8px 0; }
-  .roi-lbl { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
-  .roi-sub { font-size: 12px; color: var(--muted); margin-top: 8px; }
-  .mets { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
-  .met { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
-  .met-l { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
-  .met-v { font-size: 18px; font-weight: 600; }
-  .pos { color: #5DE8A6; } .neg { color: #FF6B6B; } .acc { color: var(--accent); }
-  .ctab { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 14px; }
-  .crow { display: flex; justify-content: space-between; padding: 9px 14px; font-size: 12px; border-bottom: 1px solid var(--border); }
-  .crow:last-child { border-bottom: none; }
-  .crow.tot { background: rgba(232,68,122,.08); font-weight: 600; font-size: 13px; }
-  .cn { color: var(--muted); }
-  .aibox { background: rgba(123,94,167,.12); border: 1px solid rgba(123,94,167,.25); border-radius: 10px; padding: 16px; margin-bottom: 14px; }
-  .aibox-t { font-size: 11px; font-weight: 600; color: rgba(180,150,230,.9); margin-bottom: 8px; }
-  .aibox-b { font-size: 12px; color: var(--muted); line-height: 1.7; }
-  .cmpbox { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 14px; }
-  .cmprow { display: flex; justify-content: space-between; align-items: center; padding: 9px 14px; font-size: 12px; border-bottom: 1px solid var(--border); }
-  .cmprow:last-child { border-bottom: none; }
-  .okico { width: 50px; height: 50px; border-radius: 50%; background: rgba(93,232,166,.12); border: 2px solid rgba(93,232,166,.35); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
-  footer { text-align: center; margin-top: 24px; font-size: 11px; color: rgba(245,244,255,0.2); position: relative; z-index: 1; }
-  footer a { color: rgba(232,68,122,.5); text-decoration: none; }
-  @media (max-width: 480px) { body { padding: 12px 8px 40px; } .hdr, .step { padding: 18px; } .g2, .g3 { grid-template-columns: 1fr; } .tagline { display: none; } .roi-num { font-size: 40px; } }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--pink:#E8447A;--purple:#7B5EA7;--grad:linear-gradient(135deg,#7B5EA7 0%,#E8447A 100%);--dark:#0D0D0F;--card:#1E1E26;--border:rgba(255,255,255,0.08);--text:#F5F4FF;--muted:rgba(245,244,255,0.5);--input:rgba(255,255,255,0.06);--accent:#FF6FA8}
+html,body{min-height:100vh;background:var(--dark);font-family:'DM Sans',sans-serif;color:var(--text)}
+body{display:flex;flex-direction:column;align-items:center;padding:40px 16px 60px}
+body::before{content:'';position:fixed;top:-150px;right:-150px;width:600px;height:600px;background:radial-gradient(circle,rgba(123,94,167,0.18) 0%,transparent 65%);pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;bottom:-100px;left:-100px;width:500px;height:500px;background:radial-gradient(circle,rgba(232,68,122,0.12) 0%,transparent 65%);pointer-events:none;z-index:0}
+#app{position:relative;z-index:1;width:100%;max-width:640px;background:#17171C;border-radius:20px;border:1px solid var(--border);overflow:hidden}
+.hdr{padding:24px 28px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px}
+.logo{width:40px;height:40px;flex-shrink:0}
+.brand{flex:1}
+.bn{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.bs{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-top:3px}
+.tg{font-size:11px;color:var(--muted);text-align:right;max-width:140px;line-height:1.5}
+.step{display:none;padding:24px 28px 28px}
+.step.on{display:block}
+.prog{display:flex;gap:6px;margin-bottom:20px}
+.dot{height:3px;border-radius:2px;flex:1;background:var(--border);transition:background .3s}
+.dot.done,.dot.on{background:var(--pink)}
+.ttl{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:4px}
+.sub{font-size:12px;color:var(--muted);margin-bottom:22px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.g1{display:grid;gap:12px}
+.f{display:flex;flex-direction:column;gap:5px}
+.lbl{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px}
+.hint{font-size:10px;color:rgba(245,244,255,0.3)}
+input[type=text],input[type=number],input[type=email],input[type=tel],select{background:var(--input);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;padding:11px 12px;width:100%;outline:none;transition:border-color .2s,background .2s;-webkit-appearance:none;appearance:none}
+input:focus,select:focus{border-color:var(--pink);background:rgba(232,68,122,0.07)}
+select option{background:#1E1E26}
+.pw{position:relative}
+.pw .pfx{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--muted);pointer-events:none}
+.pw input{padding-left:26px}
+.pw .sfx{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--muted);pointer-events:none}
+.pw.rs input{padding-right:40px}
+.sv{display:flex;flex-direction:column;gap:6px}
+.sv-val{font-size:17px;font-weight:600;color:var(--accent);text-align:center}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;background:rgba(255,255,255,0.12);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--pink);cursor:pointer;box-shadow:0 0 0 3px rgba(232,68,122,0.2)}
+.sl{display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}
+.sh{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin:18px 0 12px;display:flex;align-items:center;gap:8px}
+.sh::after{content:'';flex:1;height:1px;background:var(--border)}
+.btn{width:100%;padding:13px;background:var(--grad);border:none;border-radius:10px;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;margin-top:20px;transition:opacity .2s,transform .1s}
+.btn:hover{opacity:.88}
+.btn:active{transform:scale(.99)}
+.btn-g{background:transparent;border:1px solid var(--border);color:var(--muted);margin-top:8px}
+.btn-g:hover{border-color:var(--pink);color:var(--text);opacity:1}
+.br{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+.br .btn,.br .btn-g{margin-top:0}
+.lcard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:18px}
+.lcard-t{font-size:13px;font-weight:600;margin-bottom:6px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.lcard-b{font-size:12px;color:var(--muted);line-height:1.6}
+.notice{background:rgba(123,94,167,0.12);border:1px solid rgba(123,94,167,0.28);border-radius:10px;padding:12px 14px;font-size:11px;color:var(--muted);line-height:1.6;display:flex;gap:8px;align-items:flex-start;margin-bottom:14px}
+.cbw{display:flex;align-items:flex-start;gap:10px;margin-top:12px}
+input[type=checkbox]{width:15px;height:15px;accent-color:var(--pink);flex-shrink:0;margin-top:2px}
+.cbl{font-size:11px;color:var(--muted);line-height:1.5}
+.err{color:#FF6B6B;font-size:11px;margin-top:3px;display:none}
+.spin-wrap{text-align:center;padding:50px 20px}
+.spinner{width:40px;height:40px;border-radius:50%;border:3px solid rgba(255,255,255,.08);border-top-color:var(--pink);animation:spin .8s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hero{background:var(--card);border:1px solid rgba(232,68,122,.28);border-radius:16px;padding:24px 18px;text-align:center;margin-bottom:14px}
+.roi-num{display:inline-block;background:var(--grad);color:#fff;font-family:'Playfair Display',serif;font-size:52px;font-weight:900;line-height:1;padding:8px 24px;border-radius:12px;margin:8px 0}
+.roi-lbl{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase}
+.roi-sub{font-size:12px;color:var(--muted);margin-top:8px}
+.mets{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.met{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.met-l{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+.met-v{font-size:18px;font-weight:600}
+.pos{color:#5DE8A6}.neg{color:#FF6B6B}.acc{color:var(--accent)}
+.ctab{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px}
+.crow{display:flex;justify-content:space-between;padding:9px 14px;font-size:12px;border-bottom:1px solid var(--border)}
+.crow:last-child{border-bottom:none}
+.crow.tot{background:rgba(232,68,122,.08);font-weight:600;font-size:13px}
+.cn{color:var(--muted)}
+.aibox{background:rgba(123,94,167,.12);border:1px solid rgba(123,94,167,.25);border-radius:10px;padding:16px;margin-bottom:14px}
+.aibox-t{font-size:11px;font-weight:600;color:rgba(180,150,230,.9);margin-bottom:8px}
+.aibox-b{font-size:12px;color:var(--muted);line-height:1.7}
+.mktbox{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px}
+.mktrow{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;font-size:12px;border-bottom:1px solid var(--border)}
+.mktrow:last-child{border-bottom:none}
+.okico{width:50px;height:50px;border-radius:50%;background:rgba(93,232,166,.12);border:2px solid rgba(93,232,166,.35);display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+footer{text-align:center;margin-top:24px;font-size:11px;color:rgba(245,244,255,0.2);position:relative;z-index:1}
+footer a{color:rgba(232,68,122,.5);text-decoration:none}
+@media(max-width:480px){body{padding:12px 8px 40px}.hdr,.step{padding:18px}.g2,.g3{grid-template-columns:1fr}.tg{display:none}.roi-num{font-size:40px}}
 </style>
 </head>
 <body>
 <div id="app">
-
   <div class="hdr">
     <svg class="logo" viewBox="0 0 40 40" fill="none">
       <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7B5EA7"/><stop offset="100%" stop-color="#E8447A"/></linearGradient></defs>
@@ -114,434 +101,280 @@
       <path d="M33 4 L33 36 L16 20 Z" fill="url(#lg)" opacity="0.55"/>
     </svg>
     <div class="brand">
-      <div class="brand-name">Karafun</div>
-      <div class="brand-sub">Business · Simulateur ROI</div>
+      <div class="bn">Karafun</div>
+      <div class="bs">Business &middot; Simulateur ROI</div>
     </div>
-    <div class="tagline">Estimez votre retour sur investissement</div>
+    <div class="tg">Estimez votre retour sur investissement</div>
   </div>
 
-  <!-- ÉTAPE 1 -->
   <div class="step on" id="s1">
     <div class="prog"><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
-    <div class="ttl">Votre projet karaoké</div>
-    <div class="sub">Configurez vos boxes et votre modèle d'exploitation</div>
-
+    <div class="ttl">Votre projet</div>
+    <div class="sub">Configurez vos boxes et votre exploitation</div>
     <div class="sh">Localisation</div>
     <div class="g2">
-      <div class="f">
-        <label class="lbl">Ville du projet</label>
-        <input type="text" id="city" placeholder="Paris, Lyon, Bordeaux…">
-      </div>
-      <div class="f">
-        <label class="lbl">Rayon d'analyse</label>
-        <select id="radius">
-          <option value="5000">5 km</option>
-          <option value="10000" selected>10 km</option>
-          <option value="20000">20 km</option>
-        </select>
+      <div class="f"><label class="lbl">Ville du projet</label><input type="text" id="city" placeholder="Paris, Lyon, Bordeaux..."></div>
+      <div class="f"><label class="lbl">Nombre de boxes</label>
+        <div class="sv"><div class="sv-val" id="nb-v">2 boxes</div><input type="range" id="nb" min="1" max="20" value="2" step="1"><div class="sl"><span>1</span><span>20</span></div></div>
       </div>
     </div>
-
-    <div class="sh">Boxes</div>
-    <div class="g2">
-      <div class="f">
-        <label class="lbl">Nombre de boxes</label>
-        <div class="sv">
-          <div class="sv-val" id="nb-v">2 boxes</div>
-          <input type="range" id="nb" min="1" max="20" value="2" step="1">
-          <div class="sl"><span>1</span><span>20</span></div>
-        </div>
-      </div>
-      <div class="f">
-        <label class="lbl">Taux d'occupation</label>
-        <div class="sv">
-          <div class="sv-val" id="occ-v">55%</div>
-          <input type="range" id="occ" min="10" max="100" value="55" step="5">
-          <div class="sl"><span>10%</span><span>100%</span></div>
-        </div>
-      </div>
-    </div>
-
     <div class="sh">Tarification</div>
     <div class="g3">
-      <div class="f">
-        <label class="lbl">Tarif/h semaine</label>
-        <div class="pw"><span class="pfx">€</span><input type="number" id="pw" value="35" min="5"></div>
+      <div class="f"><label class="lbl">Tarif/h semaine</label><div class="pw"><span class="pfx">&euro;</span><input type="number" id="pw" value="35" min="5"></div></div>
+      <div class="f"><label class="lbl">Tarif/h week-end</label><div class="pw"><span class="pfx">&euro;</span><input type="number" id="pwe" value="45" min="5"></div></div>
+      <div class="f"><label class="lbl">Duree session</label><div class="pw rs"><input type="number" id="dur" value="1.5" min="0.5" max="4" step="0.5"><span class="sfx">h</span></div></div>
+    </div>
+    <div class="sh">Exploitation</div>
+    <div class="g3">
+      <div class="f"><label class="lbl">Occupation</label>
+        <div class="sv"><div class="sv-val" id="occ-v">55%</div><input type="range" id="occ" min="10" max="100" value="55" step="5"><div class="sl"><span>10%</span><span>100%</span></div></div>
       </div>
-      <div class="f">
-        <label class="lbl">Tarif/h week-end</label>
-        <div class="pw"><span class="pfx">€</span><input type="number" id="pwe" value="45" min="5"></div>
-      </div>
-      <div class="f">
-        <label class="lbl">Durée session</label>
-        <div class="pw rs"><input type="number" id="dur" value="1.5" min="0.5" max="4" step="0.5"><span class="sfx">h</span></div>
+      <div class="f"><label class="lbl">Heures/jour</label><div class="pw rs"><input type="number" id="hpd" value="10" min="4" max="24"><span class="sfx">h</span></div></div>
+      <div class="f"><label class="lbl">Jours/semaine</label>
+        <select id="dpw"><option value="5">5 j (lun-ven)</option><option value="6" selected>6 j (lun-sam)</option><option value="7">7 jours</option></select>
       </div>
     </div>
-
-    <div class="sh">Horaires</div>
-    <div class="g2">
-      <div class="f">
-        <label class="lbl">Heures/jour</label>
-        <div class="pw rs"><input type="number" id="hpd" value="10" min="4" max="24"><span class="sfx">h</span></div>
-      </div>
-      <div class="f">
-        <label class="lbl">Jours/semaine</label>
-        <select id="dpw">
-          <option value="5">5 jours (lun–ven)</option>
-          <option value="6" selected>6 jours (lun–sam)</option>
-          <option value="7">7 jours</option>
-        </select>
-      </div>
-    </div>
-
-    <button class="btn" onclick="go(2)">Étape suivante — Charges →</button>
+    <button class="btn" onclick="go(2)">Etape suivante &mdash; Charges &rarr;</button>
   </div>
 
-  <!-- ÉTAPE 2 -->
   <div class="step" id="s2">
     <div class="prog"><div class="dot done"></div><div class="dot on"></div><div class="dot"></div></div>
     <div class="ttl">Charges &amp; Investissement</div>
-    <div class="sub">Renseignez vos coûts pour un calcul précis</div>
-
+    <div class="sub">Renseignez vos couts pour un calcul precis</div>
     <div class="sh">Investissement initial</div>
     <div class="g2">
-      <div class="f">
-        <label class="lbl">Aménagement / box</label>
-        <div class="pw"><span class="pfx">€</span><input type="number" id="ibox" value="8000" step="500"></div>
-        <span class="hint">Travaux, déco, insonorisation</span>
-      </div>
-      <div class="f">
-        <label class="lbl">Matériel / box</label>
-        <div class="pw"><span class="pfx">€</span><input type="number" id="imat" value="5000" step="500"></div>
-        <span class="hint">Écrans, micros, sono, PC</span>
-      </div>
-      <div class="f">
-        <label class="lbl">Frais de structure</label>
-        <div class="pw"><span class="pfx">€</span><input type="number" id="istr" value="5000" step="500"></div>
-        <span class="hint">Logiciel résa, caisse</span>
-      </div>
-      <div class="f">
-        <label class="lbl">Amortissement sur</label>
-        <div class="pw rs"><input type="number" id="amort" value="5" min="1" max="15"><span class="sfx">ans</span></div>
-      </div>
+      <div class="f"><label class="lbl">Amenagement / box</label><div class="pw"><span class="pfx">&euro;</span><input type="number" id="ibox" value="8000" step="500"></div><span class="hint">Travaux, deco, insonorisation</span></div>
+      <div class="f"><label class="lbl">Materiel / box</label><div class="pw"><span class="pfx">&euro;</span><input type="number" id="imat" value="5000" step="500"></div><span class="hint">Ecrans, micros, sono, PC</span></div>
+      <div class="f"><label class="lbl">Frais de structure</label><div class="pw"><span class="pfx">&euro;</span><input type="number" id="istr" value="5000" step="500"></div><span class="hint">Logiciel resa, caisse</span></div>
+      <div class="f"><label class="lbl">Amortissement sur</label><div class="pw rs"><input type="number" id="amort" value="5" min="1" max="15"><span class="sfx">ans</span></div></div>
     </div>
-
     <div class="sh">Charges fixes mensuelles</div>
     <div class="g2">
-      <div class="f">
-        <label class="lbl">Loyer</label>
-        <div class="pw"><span class="pfx">€</span><input type="number" id="rent" value="3000" step="100"></div>
-      </div>
-      <div class="f">
-        <label class="lbl">Charges locatives</label>
-        <div class="pw"><span class="pfx">€</span><input type="number" id="cloc" value="400" step="50"></div>
-      </div>
-      <div class="f">
-        <label class="lbl">Masse salariale</label>
-        <div class="pw"><span class="pfx">€</span><input type="number" id="sal" value="3500" step="100"></div>
-        <span class="hint">Charges patronales incluses</span>
-      </div>
-      <div class="f">
-        <label class="lbl">Abonnement Karafun</label>
-        <div class="pw"><span class="pfx">€</span><input type="number" id="kfsub" value="398" readonly style="opacity:.7;cursor:default;border-color:rgba(232,68,122,0.3);background:rgba(232,68,122,0.05);"></div>
-        <span class="hint" id="kfsub-hint">199 € × 2 boxes = 398 €/mois</span>
-      </div>
+      <div class="f"><label class="lbl">Loyer</label><div class="pw"><span class="pfx">&euro;</span><input type="number" id="rent" value="3000" step="100"></div></div>
+      <div class="f"><label class="lbl">Charges locatives</label><div class="pw"><span class="pfx">&euro;</span><input type="number" id="cloc" value="400" step="50"></div></div>
+      <div class="f"><label class="lbl">Masse salariale</label><div class="pw"><span class="pfx">&euro;</span><input type="number" id="sal" value="3500" step="100"></div><span class="hint">Charges patronales incluses</span></div>
+      <div class="f"><label class="lbl">Abonnement Karafun</label><div class="pw"><span class="pfx">&euro;</span><input type="number" id="kfsub" value="398" readonly style="opacity:.7;cursor:default;border-color:rgba(232,68,122,0.3);background:rgba(232,68,122,0.05);"></div><span class="hint" id="kfsub-hint">199 x 2 boxes = 398 euros/mois</span></div>
     </div>
-
     <div class="sh">Autres charges mensuelles</div>
     <div class="g3">
-      <div class="f"><label class="lbl">Énergie</label><div class="pw"><span class="pfx">€</span><input type="number" id="energy" value="600" step="50"></div></div>
-      <div class="f"><label class="lbl">Assurance</label><div class="pw"><span class="pfx">€</span><input type="number" id="insur" value="250" step="25"></div></div>
-      <div class="f"><label class="lbl">Comptabilité</label><div class="pw"><span class="pfx">€</span><input type="number" id="acct" value="200" step="25"></div></div>
-      <div class="f"><label class="lbl">Marketing</label><div class="pw"><span class="pfx">€</span><input type="number" id="mktg" value="400" step="50"></div></div>
-      <div class="f"><label class="lbl">Maintenance</label><div class="pw"><span class="pfx">€</span><input type="number" id="maint" value="200" step="25"></div></div>
-      <div class="f"><label class="lbl">Divers</label><div class="pw"><span class="pfx">€</span><input type="number" id="misc" value="150" step="25"></div></div>
+      <div class="f"><label class="lbl">Energie</label><div class="pw"><span class="pfx">&euro;</span><input type="number" id="energy" value="600" step="50"></div></div>
+      <div class="f"><label class="lbl">Assurance</label><div class="pw"><span class="pfx">&euro;</span><input type="number" id="insur" value="250" step="25"></div></div>
+      <div class="f"><label class="lbl">Comptabilite</label><div class="pw"><span class="pfx">&euro;</span><input type="number" id="acct" value="200" step="25"></div></div>
+      <div class="f"><label class="lbl">Marketing</label><div class="pw"><span class="pfx">&euro;</span><input type="number" id="mktg" value="400" step="50"></div></div>
+      <div class="f"><label class="lbl">Maintenance</label><div class="pw"><span class="pfx">&euro;</span><input type="number" id="maint" value="200" step="25"></div></div>
+      <div class="f"><label class="lbl">Divers</label><div class="pw"><span class="pfx">&euro;</span><input type="number" id="misc" value="150" step="25"></div></div>
     </div>
-
     <div class="br">
-      <button class="btn btn-g" onclick="go(1)">← Retour</button>
-      <button class="btn" onclick="go(3)">Obtenir mon résultat →</button>
+      <button class="btn btn-g" onclick="go(1)">&larr; Retour</button>
+      <button class="btn" onclick="go(3)">Obtenir mon resultat &rarr;</button>
     </div>
   </div>
 
-  <!-- ÉTAPE 3 -->
   <div class="step" id="s3">
     <div class="prog"><div class="dot done"></div><div class="dot done"></div><div class="dot on"></div></div>
     <div class="ttl">Recevez votre analyse</div>
-    <div class="sub">Votre rapport ROI personnalisé vous sera envoyé par email</div>
-
+    <div class="sub">Votre rapport ROI sera envoye par email</div>
     <div class="lcard">
-      <div class="lcard-t">✦ Votre simulation est prête</div>
-      <div class="lcard-b">Renseignez vos coordonnées pour recevoir votre rapport complet. Un expert Karafun Business sera disponible pour vous accompagner.</div>
+      <div class="lcard-t">Votre simulation est prete</div>
+      <div class="lcard-b">Renseignez vos coordonnees pour recevoir votre rapport complet. Un expert Karafun Business sera disponible pour vous accompagner.</div>
     </div>
-
     <div class="g1">
-      <div class="f">
-        <label class="lbl">Prénom &amp; Nom</label>
-        <input type="text" id="lname" placeholder="Jean Dupont">
-        <span class="err" id="e-name">Veuillez renseigner votre nom</span>
-      </div>
-      <div class="f">
-        <label class="lbl">Email</label>
-        <input type="email" id="lemail" placeholder="jean@exemple.fr">
-        <span class="err" id="e-email">Email invalide</span>
-      </div>
-      <div class="f">
-        <label class="lbl">Téléphone</label>
-        <input type="tel" id="lphone" placeholder="+33 6 12 34 56 78">
-        <span class="err" id="e-phone">Téléphone requis</span>
-      </div>
-      <div class="f">
-        <label class="lbl">Stade du projet</label>
+      <div class="f"><label class="lbl">Prenom et Nom</label><input type="text" id="lname" placeholder="Jean Dupont"><span class="err" id="e-name">Veuillez renseigner votre nom</span></div>
+      <div class="f"><label class="lbl">Email</label><input type="email" id="lemail" placeholder="jean@exemple.fr"><span class="err" id="e-email">Email invalide</span></div>
+      <div class="f"><label class="lbl">Telephone</label><input type="tel" id="lphone" placeholder="+33 6 12 34 56 78"><span class="err" id="e-phone">Telephone requis</span></div>
+      <div class="f"><label class="lbl">Stade du projet</label>
         <select id="lstage">
-          <option value="etude">En phase d'étude</option>
+          <option value="etude">En phase d etude</option>
           <option value="local">Recherche de local</option>
           <option value="financement">Recherche de financement</option>
           <option value="ouverture">Ouverture dans 6 mois</option>
-          <option value="existant">Établissement existant</option>
+          <option value="existant">Etablissement existant</option>
         </select>
       </div>
     </div>
-
     <div class="notice" style="margin-top:16px;">
       <svg width="15" height="15" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px;"><circle cx="8" cy="8" r="7" stroke="rgba(123,94,167,0.7)" stroke-width="1.5"/><line x1="8" y1="7" x2="8" y2="11" stroke="rgba(123,94,167,0.7)" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="5" r="0.75" fill="rgba(123,94,167,0.7)"/></svg>
-      Données traitées conformément au RGPD. Jamais revendues. Désinscription possible à tout moment.
+      Donnees traitees conformement au RGPD. Jamais revendues.
     </div>
     <div class="cbw">
       <input type="checkbox" id="optin" checked>
-      <label for="optin" class="cbl">J'accepte de recevoir des informations commerciales de Karafun Business.</label>
+      <label for="optin" class="cbl">J accepte de recevoir des informations commerciales de Karafun Business.</label>
     </div>
     <span class="err" id="e-optin">Veuillez cocher cette case</span>
-
     <div class="br">
-      <button class="btn btn-g" onclick="go(2)">← Retour</button>
-      <button class="btn" onclick="submit()">Recevoir mon analyse →</button>
+      <button class="btn btn-g" onclick="go(2)">&larr; Retour</button>
+      <button class="btn" onclick="doSubmit()">Recevoir mon analyse &rarr;</button>
     </div>
   </div>
 
-  <!-- ÉTAPE 4 — Résultats -->
   <div class="step" id="s4">
     <div id="loading" class="spin-wrap">
       <div class="spinner"></div>
-      <div style="font-size:15px;font-weight:500;margin-bottom:6px;">Génération de votre rapport…</div>
-      <div id="load-msg" style="font-size:12px;color:var(--muted);">Calcul du ROI en cours…</div>
+      <div style="font-size:15px;font-weight:500;margin-bottom:6px;">Generation de votre rapport...</div>
+      <div id="load-msg" style="font-size:12px;color:var(--muted);">Calcul du ROI en cours...</div>
     </div>
     <div id="res"></div>
   </div>
-
 </div>
-<footer>&copy; 2025 Karafun Business — <a href="https://business.karafun.com/fr/" target="_blank">business.karafun.com</a></footer>
+<footer>&copy; 2025 Karafun Business &mdash; <a href="https://business.karafun.com/fr/" target="_blank">business.karafun.com</a></footer>
 
 <script>
-  // ⚠️ REMPLACEZ PAR VOTRE ID FORMSPREE
-  // Créez un compte gratuit sur formspree.io → New Form → copiez l'ID (ex: xpwzgkla)
-  var FORMSPREE_ID = 'VOTRE_ID_FORMSPREE';
+var FORMSPREE_ID = 'VOTRE_ID_FORMSPREE';
+var cur = 1;
 
-  var cur = 1;
+document.getElementById('nb').oninput = function() {
+  var n = parseInt(this.value);
+  document.getElementById('nb-v').textContent = n + (n > 1 ? ' boxes' : ' box');
+  var sub = n * 199;
+  document.getElementById('kfsub').value = sub;
+  document.getElementById('kfsub-hint').textContent = '199 x ' + n + (n > 1 ? ' boxes' : ' box') + ' = ' + sub + ' euros/mois';
+};
+document.getElementById('occ').oninput = function() {
+  document.getElementById('occ-v').textContent = this.value + '%';
+};
 
-  document.getElementById('nb').oninput = function() {
-    var n = parseInt(this.value);
-    document.getElementById('nb-v').textContent = n + (n > 1 ? ' boxes' : ' box');
-    var sub = n * 199;
-    document.getElementById('kfsub').value = sub;
-    document.getElementById('kfsub-hint').textContent = '199 € × ' + n + ' box' + (n > 1 ? 'es' : '') + ' = ' + sub.toLocaleString('fr-FR') + ' €/mois';
-  };
-  document.getElementById('occ').oninput = function() {
-    document.getElementById('occ-v').textContent = this.value + '%';
-  };
+function go(n) {
+  document.getElementById('s' + cur).classList.remove('on');
+  cur = n;
+  document.getElementById('s' + n).classList.add('on');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-  function go(n) {
-    document.getElementById('s' + cur).classList.remove('on');
-    cur = n;
-    document.getElementById('s' + n).classList.add('on');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+function val(id) { return parseFloat(document.getElementById(id).value) || 0; }
 
-  function v(id) { return parseFloat(document.getElementById(id).value) || 0; }
+function fmt(n) {
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
+}
 
-  function fmt(n) {
-    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
-  }
+function calc() {
+  var nb = val('nb'), occ = val('occ') / 100, hpd = val('hpd'), dpw = val('dpw');
+  var pw = val('pw'), pwe = val('pwe'), dur = val('dur') || 1;
+  var wd = Math.min(dpw, 5), we = Math.max(0, dpw - 5);
+  var days = (wd + we) * 52;
+  var pct = wd / dpw;
+  var avgP = pw * pct + pwe * (1 - pct);
+  var spd = (hpd / dur) * occ;
+  var revY = spd * avgP * dur * days * nb;
+  var revM = revY / 12;
+  var invest = (val('ibox') + val('imat')) * nb + val('istr');
+  var amortM = invest / ((val('amort') || 5) * 12);
+  var fixed = val('rent') + val('cloc') + val('sal') + val('kfsub');
+  var varC = val('energy') + val('insur') + val('acct') + val('mktg') + val('maint') + val('misc');
+  var charges = fixed + varC + amortM;
+  var net = revM - charges;
+  var roi = invest > 0 ? (net * 12 / invest) * 100 : 0;
+  var pbk = net > 0 ? invest / net : Infinity;
+  var margin = revM > 0 ? (net / revM) * 100 : 0;
+  return { nb: nb, invest: invest, revM: revM, charges: charges, net: net, roi: roi, pbk: pbk, pbkY: pbk / 12, margin: margin, rent: val('rent'), cloc: val('cloc'), sal: val('sal'), kf: val('kfsub'), energy: val('energy'), insur: val('insur'), acct: val('acct'), mktg: val('mktg'), maint: val('maint'), misc: val('misc'), amortM: amortM };
+}
 
-  function calc() {
-    var nb = v('nb'), occ = v('occ') / 100, hpd = v('hpd'), dpw = v('dpw');
-    var pw2 = v('pw'), pwe = v('pwe'), dur = v('dur') || 1;
-    var wd = Math.min(dpw, 5), we = Math.max(0, dpw - 5);
-    var days = (wd + we) * 52;
-    var pct = wd / dpw;
-    var avgP = pw2 * pct + pwe * (1 - pct);
-    var spd = (hpd / dur) * occ;
-    var revY = spd * avgP * dur * days * nb;
-    var revM = revY / 12;
-    var invest = (v('ibox') + v('imat')) * nb + v('istr');
-    var amortM = invest / ((v('amort') || 5) * 12);
-    var fixed = v('rent') + v('cloc') + v('sal') + v('kfsub');
-    var varC = v('energy') + v('insur') + v('acct') + v('mktg') + v('maint') + v('misc');
-    var charges = fixed + varC + amortM;
-    var net = revM - charges;
-    var roi = invest > 0 ? (net * 12 / invest) * 100 : 0;
-    var pbk = net > 0 ? invest / net : Infinity;
-    var margin = revM > 0 ? (net / revM) * 100 : 0;
-    return {
-      nb, invest, revM, charges, net, roi, pbk, pbkY: pbk / 12, margin,
-      d: { rent: v('rent'), cloc: v('cloc'), sal: v('sal'), kf: v('kfsub'), energy: v('energy'), insur: v('insur'), acct: v('acct'), mktg: v('mktg'), maint: v('maint'), misc: v('misc'), amortM }
-    };
-  }
+function checkForm() {
+  var name = document.getElementById('lname').value.trim();
+  var email = document.getElementById('lemail').value.trim();
+  var phone = document.getElementById('lphone').value.trim();
+  var optin = document.getElementById('optin').checked;
+  var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  var ok = true;
+  document.getElementById('e-name').style.display = name ? 'none' : 'block'; if (!name) ok = false;
+  document.getElementById('e-email').style.display = re.test(email) ? 'none' : 'block'; if (!re.test(email)) ok = false;
+  document.getElementById('e-phone').style.display = phone ? 'none' : 'block'; if (!phone) ok = false;
+  document.getElementById('e-optin').style.display = optin ? 'none' : 'block'; if (!optin) ok = false;
+  return ok;
+}
 
-  function validate() {
-    var name = document.getElementById('lname').value.trim();
-    var email = document.getElementById('lemail').value.trim();
-    var phone = document.getElementById('lphone').value.trim();
-    var optin = document.getElementById('optin').checked;
-    var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    var ok = true;
-    document.getElementById('e-name').style.display = name ? 'none' : 'block'; if (!name) ok = false;
-    document.getElementById('e-email').style.display = re.test(email) ? 'none' : 'block'; if (!re.test(email)) ok = false;
-    document.getElementById('e-phone').style.display = phone ? 'none' : 'block'; if (!phone) ok = false;
-    document.getElementById('e-optin').style.display = optin ? 'none' : 'block'; if (!optin) ok = false;
-    return ok;
-  }
-
-  function buildCmpBlock(cmp, radius) {
-    if (!cmp || !cmp.potential) return '';
-    var color = cmp.color || '#888780';
-    var h = '<div class="sh" style="margin-top:0;">Analyse du marché — ' + cmp.city + '</div>';
-    h += '<div class="cmpbox">';
-    h += '<div class="cmprow"><span class="cn">Potentiel de la zone</span><span style="font-weight:600;color:' + color + ';">' + cmp.potential + '</span></div>';
-    if (cmp.pop) h += '<div class="cmprow"><span class="cn">Population</span><span style="font-weight:500;">' + (cmp.pop/1000).toFixed(0) + ' 000 habitants</span></div>';
-    if (cmp.revenu) h += '<div class="cmprow"><span class="cn">Revenu médian</span><span style="font-weight:500;">' + Number(cmp.revenu).toLocaleString('fr-FR') + ' €/an</span></div>';
-    if (cmp.jeunes) h += '<div class="cmprow"><span class="cn">Part de jeunes (15-34 ans)</span><span style="font-weight:500;">' + cmp.jeunes + '%</span></div>';
-    if (cmp.tourisme && cmp.tourisme !== 'non évalué' && cmp.tourisme !== 'inconnu') h += '<div class="cmprow"><span class="cn">Attractivité touristique</span><span style="font-weight:500;">' + cmp.tourisme.charAt(0).toUpperCase() + cmp.tourisme.slice(1) + '</span></div>';
-    if (cmp.advice) h += '<div style="padding:12px 14px;font-size:12px;color:var(--muted);line-height:1.7;border-top:1px solid var(--border);">' + cmp.advice + '</div>';
+function showResults(r, name, email, mkt, analysis) {
+  document.getElementById('loading').style.display = 'none';
+  var nc = r.net >= 0 ? 'pos' : 'neg';
+  var mc = r.margin >= 0 ? 'pos' : 'neg';
+  var fn = name.split(' ')[0];
+  var h = '<div style="padding:0 0 8px;">';
+  h += '<div style="text-align:center;padding:20px 28px 8px;">';
+  h += '<div class="okico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#5DE8A6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
+  h += '<div style="font-family:\'Playfair Display\',serif;font-size:19px;font-weight:700;margin-bottom:5px;">Analyse prete, ' + fn + ' !</div>';
+  h += '<div style="font-size:12px;color:var(--muted);">Rapport envoye a <strong style="color:var(--accent);">' + email + '</strong></div>';
+  h += '</div><div style="padding:0 28px;">';
+  h += '<div class="hero"><div class="roi-lbl">Retour sur investissement annuel</div>';
+  h += '<div class="roi-num">' + r.roi.toFixed(1) + '%</div>';
+  h += '<div class="roi-sub">' + r.nb + ' box' + (r.nb > 1 ? 'es' : '') + ' &middot; ' + fmt(r.invest);
+  if (isFinite(r.pbk) && r.pbk > 0) h += '<br>Remboursement en <strong style="color:#5DE8A6;">' + r.pbkY.toFixed(1) + ' ans</strong>';
+  h += '</div></div>';
+  h += '<div class="mets">';
+  h += '<div class="met"><div class="met-l">CA mensuel</div><div class="met-v acc">' + fmt(r.revM) + '</div></div>';
+  h += '<div class="met"><div class="met-l">Charges/mois</div><div class="met-v">' + fmt(r.charges) + '</div></div>';
+  h += '<div class="met"><div class="met-l">Resultat net/mois</div><div class="met-v ' + nc + '">' + fmt(r.net) + '</div></div>';
+  h += '<div class="met"><div class="met-l">Marge nette</div><div class="met-v ' + mc + '">' + r.margin.toFixed(1) + '%</div></div>';
+  h += '</div>';
+  h += '<div class="sh">Detail des charges</div><div class="ctab">';
+  h += '<div class="crow"><span class="cn">Loyer et charges</span><span>' + fmt(r.rent + r.cloc) + '</span></div>';
+  h += '<div class="crow"><span class="cn">Masse salariale</span><span>' + fmt(r.sal) + '</span></div>';
+  h += '<div class="crow"><span class="cn">Abonnement Karafun</span><span>' + fmt(r.kf) + '</span></div>';
+  h += '<div class="crow"><span class="cn">Energie</span><span>' + fmt(r.energy) + '</span></div>';
+  h += '<div class="crow"><span class="cn">Assurance</span><span>' + fmt(r.insur) + '</span></div>';
+  h += '<div class="crow"><span class="cn">Comptabilite</span><span>' + fmt(r.acct) + '</span></div>';
+  h += '<div class="crow"><span class="cn">Marketing</span><span>' + fmt(r.mktg) + '</span></div>';
+  h += '<div class="crow"><span class="cn">Maintenance et divers</span><span>' + fmt(r.maint + r.misc) + '</span></div>';
+  h += '<div class="crow"><span class="cn">Amortissement</span><span>' + fmt(r.amortM) + '</span></div>';
+  h += '<div class="crow tot"><span>Total mensuel</span><span>' + fmt(r.charges) + '</span></div></div>';
+  if (mkt && mkt.potential) {
+    var mc2 = mkt.color || '#888780';
+    h += '<div class="sh" style="margin-top:0;">Analyse du marche local</div><div class="mktbox">';
+    h += '<div class="mktrow"><span class="cn">Ville analysee</span><span style="font-weight:500;">' + mkt.city + '</span></div>';
+    h += '<div class="mktrow"><span class="cn">Potentiel de la zone</span><span style="font-weight:600;color:' + mc2 + ';">' + mkt.potential + '</span></div>';
+    if (mkt.pop) h += '<div class="mktrow"><span class="cn">Population</span><span style="font-weight:500;">' + Math.round(mkt.pop / 1000) + ' 000 hab.</span></div>';
+    if (mkt.revenu) h += '<div class="mktrow"><span class="cn">Revenu median</span><span style="font-weight:500;">' + Math.round(mkt.revenu).toLocaleString('fr-FR') + ' euros/an</span></div>';
+    if (mkt.jeunes) h += '<div class="mktrow"><span class="cn">Part jeunes 15-34 ans</span><span style="font-weight:500;">' + mkt.jeunes + '%</span></div>';
+    if (mkt.tourisme && mkt.tourisme !== 'non evalue' && mkt.tourisme !== 'inconnu') h += '<div class="mktrow"><span class="cn">Attractivite touristique</span><span style="font-weight:500;">' + mkt.tourisme + '</span></div>';
+    if (mkt.advice) h += '<div style="padding:12px 14px;font-size:12px;color:var(--muted);line-height:1.7;border-top:1px solid var(--border);">' + mkt.advice + '</div>';
     h += '</div>';
-    return h;
   }
+  if (analysis) {
+    h += '<div class="aibox"><div class="aibox-t">Analyse personnalisee Karafun Business</div>';
+    h += '<div class="aibox-b">' + analysis.replace(/\n/g, '<br>') + '</div></div>';
+  }
+  h += '<a href="https://meetings-eu1.hubspot.com/meetings/acaupert?uuid=e4041660-e0bf-43e9-9a08-b26ddd6ddaee" target="_blank" style="display:block;text-decoration:none;">';
+  h += '<button class="btn" style="margin-top:0;">Parler a un expert Karafun &rarr;</button></a>';
+  h += '<button class="btn btn-g" onclick="location.reload()">Nouvelle simulation</button>';
+  h += '</div></div>';
+  document.getElementById('res').innerHTML = h;
+}
 
-  async function submit() {
-    if (!validate()) return;
-    go(4);
-
-    var r = calc();
-    var name = document.getElementById('lname').value.trim();
-    var email = document.getElementById('lemail').value.trim();
-    var phone = document.getElementById('lphone').value.trim();
-    var stageEl = document.getElementById('lstage');
-    var stage = stageEl.options[stageEl.selectedIndex].text;
-    var city = document.getElementById('city').value.trim();
-    var radius = parseInt(document.getElementById('radius').value);
-
-    // 1. Analyse du marché local (données socio-économiques)
-    document.getElementById('load-msg').textContent = 'Analyse du marché local…';
-    var cmp = null;
-    if (city) {
-      try {
-        var cmpRes = await fetch('/api/places', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ city: city })
-        });
-        var cmpData = await cmpRes.json();
-        if (!cmpData.error) cmp = cmpData;
-      } catch(e) { cmp = null; }
-    }
-
-    // 2. Analyse IA via Vercel Function
-    document.getElementById('load-msg').textContent = 'Génération de l\'analyse IA…';
-    var cmpCtx = cmp && cmp.score ? '\n- Ville : ' + cmp.city + '\n- Population : ' + (cmp.pop/1000).toFixed(0) + ' 000 habitants\n- Revenu médian : ' + (cmp.revenu || 0).toLocaleString('fr-FR') + ' \u20ac/an\n- Part de jeunes : ' + cmp.jeunes + '%\n- Tourisme : ' + cmp.tourisme + '\n- Potentiel march\u00e9 : ' + cmp.potential : '';
-    var prompt = 'Tu es un expert en business karaoké pour Karafun Business. Génère une analyse personnalisée courte (4-5 paragraphes) en français pour ' + name + ', porteur d\'un projet de ' + r.nb + ' box(es) karaoké.\n\nDonnées :\n- Investissement : ' + fmt(r.invest) + '\n- CA mensuel : ' + fmt(r.revM) + '\n- Charges : ' + fmt(r.charges) + '\n- Résultat net/mois : ' + fmt(r.net) + '\n- ROI annuel : ' + r.roi.toFixed(1) + '%\n- Retour invest. : ' + (isFinite(r.pbk) && r.pbk > 0 ? r.pbkY.toFixed(1) + ' ans' : 'modèle à revoir') + '\n- Stade : ' + stage + cmpCtx + '\n\nTon : professionnel, chaleureux, direct. Pas de liste à puces. Uniquement du texte.';
-
-    var analysis = null;
+async function doSubmit() {
+  if (!checkForm()) return;
+  go(4);
+  var r = calc();
+  var name = document.getElementById('lname').value.trim();
+  var email = document.getElementById('lemail').value.trim();
+  var phone = document.getElementById('lphone').value.trim();
+  var stageEl = document.getElementById('lstage');
+  var stage = stageEl.options[stageEl.selectedIndex].text;
+  var city = document.getElementById('city').value.trim();
+  document.getElementById('load-msg').textContent = 'Analyse du marche local...';
+  var mkt = null;
+  if (city) {
     try {
-      var aiRes = await fetch('/api/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: prompt })
-      });
-      var aiData = await aiRes.json();
-      analysis = aiData.analysis || null;
-    } catch(e) { analysis = null; }
-
-    // 3. Envoi Formspree
-    document.getElementById('load-msg').textContent = 'Envoi du rapport…';
-    try {
-      await fetch('https://formspree.io/f/' + FORMSPREE_ID, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nom: name, email: email, telephone: phone,
-          stade: stage, ville: city || 'Non renseignée',
-          nb_boxes: r.nb,
-          roi_annuel: r.roi.toFixed(1) + '%',
-          ca_mensuel: fmt(r.revM),
-          resultat_net: fmt(r.net),
-          investissement: fmt(r.invest),
-          charges: fmt(r.charges),
-          retour_invest: isFinite(r.pbk) && r.pbk > 0 ? r.pbkY.toFixed(1) + ' ans' : 'N/A',
-          nb_concurrents: cmp ? cmp.count : 'N/A',
-          niveau_concurrence: cmp ? (cmp.potential || 'N/A') : 'N/A'
-        })
-      });
-    } catch(e) { }
-
-    renderResults(r, name, email, analysis, cmp, radius);
+      var mktRes = await fetch('/api/places', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ city: city }) });
+      var mktData = await mktRes.json();
+      if (mktData && mktData.potential) mkt = mktData;
+    } catch(e) { mkt = null; }
   }
-
-  function renderResults(r, name, email, analysis, cmp, radius) {
-    document.getElementById('loading').style.display = 'none';
-    var nc = r.net >= 0 ? 'pos' : 'neg';
-    var mc = r.margin >= 0 ? 'pos' : 'neg';
-    var fn = name.split(' ')[0];
-
-    var html = '<div style="padding:0 0 8px;">';
-    html += '<div style="text-align:center;padding:20px 28px 8px;">';
-    html += '<div class="okico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#5DE8A6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>';
-    html += '<div style="font-family:\'Playfair Display\',serif;font-size:19px;font-weight:700;margin-bottom:5px;">Analyse prête, ' + fn + ' !</div>';
-    html += '<div style="font-size:12px;color:var(--muted);">Rapport envoyé à <strong style="color:var(--accent);">' + email + '</strong></div>';
-    html += '</div>';
-    html += '<div style="padding:0 28px;">';
-
-    html += '<div class="hero">';
-    html += '<div class="roi-lbl">Retour sur investissement annuel</div>';
-    html += '<div class="roi-num">' + r.roi.toFixed(1) + '%</div>';
-    html += '<div class="roi-sub">' + r.nb + ' box' + (r.nb > 1 ? 'es' : '') + ' &nbsp;·&nbsp; ' + fmt(r.invest);
-    if (isFinite(r.pbk) && r.pbk > 0) html += '<br>Remboursement en <strong style="color:#5DE8A6;">' + r.pbkY.toFixed(1) + ' ans</strong>';
-    html += '</div></div>';
-
-    html += '<div class="mets">';
-    html += '<div class="met"><div class="met-l">CA mensuel</div><div class="met-v acc">' + fmt(r.revM) + '</div></div>';
-    html += '<div class="met"><div class="met-l">Charges/mois</div><div class="met-v">' + fmt(r.charges) + '</div></div>';
-    html += '<div class="met"><div class="met-l">Résultat net/mois</div><div class="met-v ' + nc + '">' + fmt(r.net) + '</div></div>';
-    html += '<div class="met"><div class="met-l">Marge nette</div><div class="met-v ' + mc + '">' + r.margin.toFixed(1) + '%</div></div>';
-    html += '</div>';
-
-    html += '<div class="sh">Détail des charges</div>';
-    html += '<div class="ctab">';
-    html += '<div class="crow"><span class="cn">Loyer &amp; charges</span><span>' + fmt(r.d.rent + r.d.cloc) + '</span></div>';
-    html += '<div class="crow"><span class="cn">Masse salariale</span><span>' + fmt(r.d.sal) + '</span></div>';
-    html += '<div class="crow"><span class="cn">Abonnement Karafun</span><span>' + fmt(r.d.kf) + '</span></div>';
-    html += '<div class="crow"><span class="cn">Énergie</span><span>' + fmt(r.d.energy) + '</span></div>';
-    html += '<div class="crow"><span class="cn">Assurance</span><span>' + fmt(r.d.insur) + '</span></div>';
-    html += '<div class="crow"><span class="cn">Comptabilité</span><span>' + fmt(r.d.acct) + '</span></div>';
-    html += '<div class="crow"><span class="cn">Marketing</span><span>' + fmt(r.d.mktg) + '</span></div>';
-    html += '<div class="crow"><span class="cn">Maintenance &amp; divers</span><span>' + fmt(r.d.maint + r.d.misc) + '</span></div>';
-    html += '<div class="crow"><span class="cn">Amortissement</span><span>' + fmt(r.d.amortM) + '</span></div>';
-    html += '<div class="crow tot"><span>Total mensuel</span><span>' + fmt(r.charges) + '</span></div>';
-    html += '</div>';
-
-    if (cmp && cmp.potential) html += buildCmpBlock(cmp, radius);
-
-    if (analysis) {
-      html += '<div class="aibox"><div class="aibox-t">✦ Analyse personnalisée Karafun Business</div>';
-      html += '<div class="aibox-b">' + analysis.replace(/\n/g, '<br>') + '</div></div>';
-    }
-
-    html += '<a href="https://meetings-eu1.hubspot.com/meetings/acaupert?uuid=e4041660-e0bf-43e9-9a08-b26ddd6ddaee" target="_blank" style="display:block;text-decoration:none;">';
-    html += '<button class="btn" style="margin-top:0;">Parler à un expert Karafun →</button></a>';
-    html += '<button class="btn btn-g" onclick="location.reload()">Nouvelle simulation</button>';
-    html += '</div></div>';
-
-    document.getElementById('res').innerHTML = html;
+  document.getElementById('load-msg').textContent = 'Generation de l analyse IA...';
+  var ctx = '';
+  if (mkt && mkt.potential) {
+    ctx = '\n- Ville : ' + mkt.city + '\n- Population : ' + Math.round(mkt.pop / 1000) + ' 000 habitants\n- Revenu median : ' + mkt.revenu + ' euros/an\n- Part de jeunes : ' + mkt.jeunes + '%\n- Potentiel marche : ' + mkt.potential;
   }
+  var prompt = 'Tu es un expert en business karaoke pour Karafun Business. Genere une analyse personnalisee courte (4-5 paragraphes) en francais pour ' + name + ', porteur d un projet de ' + r.nb + ' box(es) karaoke.\n\nDonnees :\n- Investissement : ' + fmt(r.invest) + '\n- CA mensuel : ' + fmt(r.revM) + '\n- Charges : ' + fmt(r.charges) + '\n- Resultat net/mois : ' + fmt(r.net) + '\n- ROI annuel : ' + r.roi.toFixed(1) + '%\n- Retour invest. : ' + (isFinite(r.pbk) && r.pbk > 0 ? r.pbkY.toFixed(1) + ' ans' : 'modele a revoir') + '\n- Stade : ' + stage + ctx + '\n\nTon : professionnel, chaleureux, direct. Pas de liste a puces. Uniquement du texte.';
+  var analysis = null;
+  try {
+    var aiRes = await fetch('/api/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: prompt }) });
+    var aiData = await aiRes.json();
+    if (aiData && aiData.analysis) analysis = aiData.analysis;
+  } catch(e) { analysis = null; }
+  document.getElementById('load-msg').textContent = 'Envoi du rapport...';
+  try {
+    await fetch('https://formspree.io/f/' + FORMSPREE_ID, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nom: name, email: email, telephone: phone, stade: stage, ville: city || 'Non renseignee', nb_boxes: r.nb, roi_annuel: r.roi.toFixed(1) + '%', ca_mensuel: fmt(r.revM), resultat_net: fmt(r.net), investissement: fmt(r.invest), charges: fmt(r.charges), retour_invest: isFinite(r.pbk) && r.pbk > 0 ? r.pbkY.toFixed(1) + ' ans' : 'N/A', potentiel_marche: mkt ? mkt.potential : 'N/A' }) });
+  } catch(e) {}
+  showResults(r, name, email, mkt, analysis);
+}
 </script>
 </body>
 </html>
