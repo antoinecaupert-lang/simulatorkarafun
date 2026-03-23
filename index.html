@@ -403,15 +403,16 @@
   }
 
   function buildCmpBlock(cmp, radius) {
-    var km = Math.round(radius / 1000);
+    if (!cmp || !cmp.potential) return '';
+    var color = cmp.color || '#888780';
     var h = '<div class="sh" style="margin-top:0;">Analyse du marché — ' + cmp.city + '</div>';
     h += '<div class="cmpbox">';
-    h += '<div class="cmprow"><span class="cn">Boxes karaoké détectées dans ' + km + ' km</span><span style="font-weight:600;color:' + l.color + ';">' + cmp.count + '</span></div>';
-    h += '<div class="cmprow"><span class="cn">Niveau de concurrence</span><span style="font-weight:600;color:' + l.color + ';">' + l.label + '</span></div>';
-    if (parseFloat(cmp.avgRating) > 0) {
-      h += '<div class="cmprow"><span class="cn">Note moyenne des concurrents</span><span style="font-weight:600;">⭐ ' + cmp.avgRating + '/5</span></div>';
-    }
-    h += '<div style="padding:12px 14px;font-size:12px;color:var(--muted);line-height:1.7;border-top:1px solid var(--border);">' + l.text + '</div>';
+    h += '<div class="cmprow"><span class="cn">Potentiel de la zone</span><span style="font-weight:600;color:' + color + ';">' + cmp.potential + '</span></div>';
+    if (cmp.pop) h += '<div class="cmprow"><span class="cn">Population</span><span style="font-weight:500;">' + (cmp.pop/1000).toFixed(0) + ' 000 habitants</span></div>';
+    if (cmp.revenu) h += '<div class="cmprow"><span class="cn">Revenu médian</span><span style="font-weight:500;">' + Number(cmp.revenu).toLocaleString('fr-FR') + ' €/an</span></div>';
+    if (cmp.jeunes) h += '<div class="cmprow"><span class="cn">Part de jeunes (15-34 ans)</span><span style="font-weight:500;">' + cmp.jeunes + '%</span></div>';
+    if (cmp.tourisme && cmp.tourisme !== 'non évalué' && cmp.tourisme !== 'inconnu') h += '<div class="cmprow"><span class="cn">Attractivité touristique</span><span style="font-weight:500;">' + cmp.tourisme.charAt(0).toUpperCase() + cmp.tourisme.slice(1) + '</span></div>';
+    if (cmp.advice) h += '<div style="padding:12px 14px;font-size:12px;color:var(--muted);line-height:1.7;border-top:1px solid var(--border);">' + cmp.advice + '</div>';
     h += '</div>';
     return h;
   }
