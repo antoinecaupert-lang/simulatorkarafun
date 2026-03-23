@@ -402,14 +402,6 @@
     return ok;
   }
 
-  function lvl(n) {
-    if (n === 0) return { label: 'Aucune concurrence détectée', color: '#5DE8A6', text: 'Excellente opportunité : aucune box de karaoké privative n'a été détectée dans cette zone. Vous seriez le premier acteur sur ce marché, avec un potentiel de captation maximal de la demande locale.' };
-    if (n === 1) return { label: 'Très faible concurrence', color: '#5DE8A6', text: 'Zone très favorable : un seul concurrent direct a été détecté dans la zone. Le marché est encore largement ouvert et la demande non satisfaite est probablement importante.' };
-    if (n <= 3) return { label: 'Faible concurrence', color: '#5DE8A6', text: 'Zone favorable : peu de boxes de karaoké sont présentes dans la zone. Le marché reste accessible et une offre de qualité peut facilement se démarquer.' };
-    if (n <= 6) return { label: 'Concurrence modérée', color: '#FFD166', text: 'Zone à potentiel : plusieurs acteurs sont déjà présents. Une différenciation par la qualité, le prix ou l'expérience client sera essentielle pour capter des parts de marché.' };
-    return { label: 'Marché concurrentiel', color: '#FF6B6B', text: 'Zone saturée : de nombreuses boxes de karaoké sont déjà présentes. Le projet nécessite une analyse approfondie du positionnement et une offre très différenciante pour réussir.' };
-  }
-
   function buildCmpBlock(cmp, radius) {
     var l = lvl(cmp.count);
     var km = Math.round(radius / 1000);
