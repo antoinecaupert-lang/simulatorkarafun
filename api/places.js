@@ -13,6 +13,18 @@ function get(url) {
   });
 }
 
+function parseBody(req) {
+  return new Promise(function(resolve) {
+    if (req.body) return resolve(req.body);
+    var data = '';
+    req.on('data', function(chunk) { data += chunk; });
+    req.on('end', function() {
+      try { resolve(JSON.parse(data)); }
+      catch(e) { resolve({}); }
+    });
+  });
+}
+
 module.exports = async function(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -24,7 +36,7 @@ module.exports = async function(req, res) {
   var KEY = process.env.GOOGLE_PLACES_KEY;
   if (!KEY) return res.status(500).json({ error: 'No API key configured' });
 
-  var body = req.body || {};
+  var body = await parseBody(req);
   var city = body.city;
   var radius = body.radius || 10000;
   var country = body.country || 'France';
@@ -61,8 +73,7 @@ module.exports = async function(req, res) {
       + '&key=' + KEY;
 
     var placesData = await get(placesUrl);
-    var results = placesData.results || [];
-    results = results.slice(0, 10);
+    var results = (placesData.results || []).slice(0, 10);
 
     var competitors = results.map(function(p) {
       return { name: p.name, rating: p.rating || null, vicinity: p.vicinity || '' };
