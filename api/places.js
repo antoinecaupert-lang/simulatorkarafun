@@ -3,16 +3,16 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const GOOGLE_KEY = process.env.GOOGLE_PLACES_KEY;
+  const AIzaSyBNDmKzCP7JnzpizBFETqNQG2ojSJ9kXGE = process.env.GOOGLE_PLACES_KEY;
   const { city, radius, country } = req.body || {};
 
-  if (!city || !GOOGLE_KEY) return res.status(400).json({ error: 'Missing params' });
+  if (!city || !AIzaSyBNDmKzCP7JnzpizBFETqNQG2ojSJ9kXGE) return res.status(400).json({ error: 'Missing params' });
 
   try {
     const geoRes = await fetch(
       'https://maps.googleapis.com/maps/api/geocode/json?address=' +
       encodeURIComponent(city + ', ' + (country || 'France')) +
-      '&key=' + GOOGLE_KEY
+      '&key=' + AIzaSyBNDmKzCP7JnzpizBFETqNQG2ojSJ9kXGE
     );
     const geoData = await geoRes.json();
     if (!geoData.results || !geoData.results[0]) return res.status(200).json({ error: 'City not found' });
@@ -26,7 +26,7 @@ export default async function handler(req, res) {
       'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' +
       loc.lat + ',' + loc.lng +
       '&radius=' + (radius || 10000) +
-      '&keyword=karaoké+karaoke+bar&type=establishment&key=' + GOOGLE_KEY
+      '&keyword=karaoké+karaoke+bar&type=establishment&key=' + AIzaSyBNDmKzCP7JnzpizBFETqNQG2ojSJ9kXGE
     );
     const placesData = await placesRes.json();
     const results = placesData.results || [];
