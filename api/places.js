@@ -45,7 +45,7 @@ module.exports = async function(req, res) {
       if (comps[i].types.indexOf('locality') !== -1) { cityName = comps[i].long_name; break; }
     }
 
-    var keywords = ['karaoké box', 'karaoke bar', 'karaoke room'];
+    var keywords = ['karaoké box', 'karaoke room'];
     var seen = {};
     var unique = [];
 
