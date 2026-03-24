@@ -386,7 +386,7 @@ async function doSubmit() {
     qualification = 'Lead froid';
   }
   try {
-    await fetch('https://formspree.io/f/' + xvzwjerk, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nom: name, email: email, telephone: phone, stade: stage, ville: city || 'Non renseignee', nb_boxes: r.nb, roi_annuel: r.roi.toFixed(1) + '%', ca_mensuel: fmt(r.revM), resultat_net: fmt(r.net), investissement: fmt(r.invest), charges: fmt(r.charges), retour_invest: isFinite(r.pbk) && r.pbk > 0 ? r.pbkY.toFixed(1) + ' ans' : 'N/A', potentiel_marche: mkt ? mkt.potential : 'N/A', qualification: qualification }) });
+    await fetch('https://formspree.io/f/' + FORMSPREE_ID, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nom: name, email: email, telephone: phone, stade: stage, ville: city || 'Non renseignee', nb_boxes: r.nb, roi_annuel: r.roi.toFixed(1) + '%', ca_mensuel: fmt(r.revM), resultat_net: fmt(r.net), investissement: fmt(r.invest), charges: fmt(r.charges), retour_invest: isFinite(r.pbk) && r.pbk > 0 ? r.pbkY.toFixed(1) + ' ans' : 'N/A', potentiel_marche: mkt ? mkt.potential : 'N/A', qualification: qualification }) });
   } catch(e) {}
   showResults(r, name, email, mkt, analysis, qualification);
 }
