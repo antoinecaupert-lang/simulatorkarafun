@@ -386,7 +386,23 @@ async function doSubmit() {
     qualification = 'Lead froid';
   }
   try {
-    await fetch('https://formspree.io/f/' + FORMSPREE_ID, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nom: name, email: email, telephone: phone, stade: stage, ville: city || 'Non renseignee', nb_boxes: r.nb, roi_annuel: r.roi.toFixed(1) + '%', ca_mensuel: fmt(r.revM), resultat_net: fmt(r.net), investissement: fmt(r.invest), charges: fmt(r.charges), retour_invest: isFinite(r.pbk) && r.pbk > 0 ? r.pbkY.toFixed(1) + ' ans' : 'N/A', potentiel_marche: mkt ? mkt.potential : 'N/A', qualification: qualification }) });
+    var fd = new FormData();
+    fd.append('nom', name);
+    fd.append('email', email);
+    fd.append('telephone', phone);
+    fd.append('stade', stage);
+    fd.append('ville', city || 'Non renseignee');
+    fd.append('nb_boxes', r.nb);
+    fd.append('roi_annuel', r.roi.toFixed(1) + '%');
+    fd.append('ca_mensuel', fmt(r.revM));
+    fd.append('resultat_net', fmt(r.net));
+    fd.append('investissement', fmt(r.invest));
+    fd.append('charges', fmt(r.charges));
+    fd.append('retour_invest', isFinite(r.pbk) && r.pbk > 0 ? r.pbkY.toFixed(1) + ' ans' : 'N/A');
+    fd.append('potentiel_marche', mkt ? mkt.potential : 'N/A');
+    fd.append('qualification', qualification);
+    fd.append('_replyto', email);
+    await fetch('https://formspree.io/f/' + FORMSPREE_ID, { method: 'POST', body: fd });
   } catch(e) {}
   showResults(r, name, email, mkt, analysis, qualification);
 }
