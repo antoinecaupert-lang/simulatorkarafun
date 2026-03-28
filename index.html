@@ -218,7 +218,7 @@ function estimateLoyer(city) {
     'colombes':20,'nanterre':22,'neuilly-sur-seine':45,'courbevoie':28,
     'marne-la-vallee':18,'cergy':14,'evry':13,'melun':12
   };
-  var cityN = city.toLowerCase().trim().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  var cityN = city.toLowerCase().trim().split('').filter(function(c){var code=c.charCodeAt(0);return code<768||code>879;}).join('');
   var p = prix[cityN];
   if (!p) {
     var keys = Object.keys(prix);
