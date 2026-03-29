@@ -178,216 +178,106 @@ footer a{color:rgba(232,68,122,.5);text-decoration:none}
 </div>
 <footer>&copy; 2025 Karafun Business &mdash; <a href="https://business.karafun.com/fr/" target="_blank">business.karafun.com</a></footer>
 <script>
-var FORMSPREE_ID = 'VOTRE_ID_FORMSPREE';
-var cur = 1, loyerEstime = null, cityTimeout = null;
-
-document.getElementById('nb').oninput = function() {
-  var n = parseInt(this.value);
-  document.getElementById('nb-v').textContent = n + (n > 1 ? ' boxes' : ' box');
-  var sub = n * 199;
-  document.getElementById('kfsub').value = sub;
-  document.getElementById('kfsub-hint').textContent = '199 x ' + n + (n > 1 ? ' boxes' : ' box') + ' = ' + sub + ' euros/mois';
-  document.getElementById('energy').value = n * 150;
-  document.getElementById('energy-hint').textContent = '150 EUR x ' + n + ' box' + (n > 1 ? 'es' : '');
-  if (loyerEstime !== null) updateLoyerFromEstimate(loyerEstime, n);
+var cur=1,loyerEstime=null,cityTimeout=null;
+document.getElementById('nb').oninput=function(){
+  var n=parseInt(this.value);
+  document.getElementById('nb-v').textContent=n+(n>1?' boxes':' box');
+  var sub=n*199;
+  document.getElementById('kfsub').value=sub;
+  document.getElementById('kfsub-hint').textContent='199 x '+n+(n>1?' boxes':' box')+' = '+sub+' euros/mois';
+  document.getElementById('energy').value=n*150;
+  document.getElementById('energy-hint').textContent='150 EUR x '+n+' box'+(n>1?'es':'');
+  if(loyerEstime!==null)updateLoyer(loyerEstime,n);
 };
-document.getElementById('occ').oninput = function() {
-  document.getElementById('occ-v').textContent = this.value + '%';
-};
-
-function onCityInput() {
+document.getElementById('occ').oninput=function(){document.getElementById('occ-v').textContent=this.value+'%';};
+function onCityInput(){
   clearTimeout(cityTimeout);
-  var city = document.getElementById('city').value.trim();
-  if (!city || city.length < 3) { document.getElementById('loyer-info').textContent = ''; return; }
-  cityTimeout = setTimeout(function() { estimateLoyer(city); }, 500);
+  var c=document.getElementById('city').value.trim();
+  if(!c||c.length<3){document.getElementById('loyer-info').textContent='';return;}
+  cityTimeout=setTimeout(function(){estimateLoyer(c);},500);
 }
-
-function estimateLoyer(city) {
-  var nb = parseInt(document.getElementById('nb').value) || 2;
-  var prix = {'paris':60,'lyon':22,'marseille':18,'toulouse':17,'nice':22,'nantes':16,'montpellier':15,'strasbourg':18,'bordeaux':20,'lille':18,'rennes':16,'reims':12,'le havre':11,'saint-etienne':10,'toulon':14,'grenoble':16,'dijon':13,'angers':14,'nimes':13,'villeurbanne':16,'le mans':11,'aix-en-provence':20,'clermont-ferrand':12,'brest':12,'tours':13,'amiens':12,'limoges':10,'perpignan':11,'metz':13,'besancon':12,'orleans':13,'mulhouse':11,'caen':12,'rouen':14,'nancy':13,'avignon':14,'poitiers':12,'dunkerque':10,'pau':12,'bayonne':14,'annecy':18,'biarritz':20,'la rochelle':14,'cannes':30,'antibes':22,'versailles':30,'saint-denis':18,'boulogne-billancourt':35,'levallois-perret':38,'neuilly-sur-seine':45,'courbevoie':28,'nanterre':22,'marne-la-vallee':18,'cergy':14};
-  var cityN = city.toLowerCase().trim();
-  var p = prix[cityN];
-  if (!p) { var keys = Object.keys(prix); for (var i = 0; i < keys.length; i++) { if (cityN.indexOf(keys[i]) >= 0 || keys[i].indexOf(cityN) >= 0) { p = prix[keys[i]]; break; } } }
-  if (!p) { p = 13; document.getElementById('loyer-info').textContent = '~ ' + p + ' EUR/m2/mois (estimation moyenne)'; }
-  else { document.getElementById('loyer-info').textContent = '~ ' + p + ' EUR/m2/mois estime a ' + city; }
-  loyerEstime = p;
-  updateLoyerFromEstimate(p, nb);
+function estimateLoyer(city){
+  var nb=parseInt(document.getElementById('nb').value)||2;
+  var p={'paris':60,'lyon':22,'marseille':18,'toulouse':17,'nice':22,'nantes':16,'montpellier':15,'strasbourg':18,'bordeaux':20,'lille':18,'rennes':16,'reims':12,'toulon':14,'grenoble':16,'dijon':13,'angers':14,'nimes':13,'brest':12,'tours':13,'amiens':12,'limoges':10,'perpignan':11,'metz':13,'orleans':13,'mulhouse':11,'caen':12,'rouen':14,'nancy':13,'avignon':14,'pau':12,'bayonne':14,'annecy':18,'biarritz':20,'cannes':30,'versailles':30,'nanterre':22,'neuilly-sur-seine':45,'levallois-perret':38,'boulogne-billancourt':35,'saint-denis':18,'cergy':14,'marne-la-vallee':18};
+  var cn=city.toLowerCase().trim();
+  var vv=p[cn];
+  if(!vv){var ks=Object.keys(p);for(var i=0;i<ks.length;i++){if(cn.indexOf(ks[i])>=0||ks[i].indexOf(cn)>=0){vv=p[ks[i]];break;}}}
+  if(!vv){vv=13;document.getElementById('loyer-info').textContent='~ '+vv+' EUR/m2/mois';}
+  else{document.getElementById('loyer-info').textContent='~ '+vv+' EUR/m2/mois estime a '+city;}
+  loyerEstime=vv;updateLoyer(vv,nb);
 }
-
-function updateLoyerFromEstimate(p, nb) {
-  var surface = nb * 20 + 30;
-  var loyer = p * surface;
-  document.getElementById('rent').value = loyer;
-  document.getElementById('rent-hint').textContent = surface + ' m2 (' + nb + ' boxes x 20m2 + 30m2 accueil) x ' + p + ' EUR/m2 = ' + loyer.toLocaleString('fr-FR') + ' EUR/mois';
+function updateLoyer(vv,nb){
+  var s=nb*20+30,l=vv*s;
+  document.getElementById('rent').value=l;
+  document.getElementById('rent-hint').textContent=s+' m2 x '+vv+' EUR/m2 = '+l.toLocaleString('fr-FR')+' EUR/mois';
 }
-
-function go(n) {
-  document.getElementById('s' + cur).classList.remove('on');
-  cur = n;
-  document.getElementById('s' + n).classList.add('on');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+function go(n){document.getElementById('s'+cur).classList.remove('on');cur=n;document.getElementById('s'+n).classList.add('on');window.scrollTo({top:0,behavior:'smooth'});}
+function v(id){return parseFloat(document.getElementById(id).value)||0;}
+function fmt(n){return new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n);}
+function calc(){
+  var nb=v('nb'),occ=v('occ')/100,hpd=v('hpd'),dpw=v('dpw'),pw=v('pw'),pwe=v('pwe'),dur=v('dur')||1;
+  var wd=Math.min(dpw,5),we=Math.max(0,dpw-5),days=(wd+we)*52,pct=wd/dpw;
+  var avgP=pw*pct+pwe*(1-pct),spd=(hpd/dur)*occ;
+  var revY=spd*avgP*dur*days*nb,revM=revY/12;
+  var invest=(v('ibox')+v('imat'))*nb+v('istr');
+  var amortM=invest/((v('amort')||5)*12);
+  var fixed=v('rent')+v('cloc')+v('sal')+v('kfsub');
+  var varC=v('energy')+v('insur')+v('acct')+v('mktg')+v('maint')+v('misc');
+  var charges=fixed+varC+amortM,net=revM-charges;
+  var roi=invest>0?(net*12/invest)*100:0,pbk=net>0?invest/net:Infinity,margin=revM>0?(net/revM)*100:0;
+  var revMb=revM*1.4,netB=revMb-charges,roiB=invest>0?(netB*12/invest)*100:0,pbkB=netB>0?invest/netB:Infinity;
+  return{nb:nb,invest:invest,revM:revM,charges:charges,net:net,roi:roi,pbk:pbk,pbkY:pbk/12,margin:margin,rent:v('rent'),cloc:v('cloc'),sal:v('sal'),kf:v('kfsub'),energy:v('energy'),insur:v('insur'),acct:v('acct'),mktg:v('mktg'),maint:v('maint'),misc:v('misc'),amortM:amortM,revMb:revMb,netB:netB,roiB:roiB,pbkB:pbkB,pbkYb:pbkB/12};
 }
-
-function val(id) { return parseFloat(document.getElementById(id).value) || 0; }
-function fmt(n) { return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n); }
-
-function calc() {
-  var nb = val('nb'), occ = val('occ') / 100, hpd = val('hpd'), dpw = val('dpw');
-  var pw = val('pw'), pwe = val('pwe'), dur = val('dur') || 1;
-  var wd = Math.min(dpw, 5), we = Math.max(0, dpw - 5);
-  var days = (wd + we) * 52, pct = wd / dpw;
-  var avgP = pw * pct + pwe * (1 - pct);
-  var spd = (hpd / dur) * occ;
-  var revY = spd * avgP * dur * days * nb, revM = revY / 12;
-  var invest = (val('ibox') + val('imat')) * nb + val('istr');
-  var amortM = invest / ((val('amort') || 5) * 12);
-  var fixed = val('rent') + val('cloc') + val('sal') + val('kfsub');
-  var varC = val('energy') + val('insur') + val('acct') + val('mktg') + val('maint') + val('misc');
-  var charges = fixed + varC + amortM, net = revM - charges;
-  var roi = invest > 0 ? (net * 12 / invest) * 100 : 0;
-  var pbk = net > 0 ? invest / net : Infinity;
-  var margin = revM > 0 ? (net / revM) * 100 : 0;
-  var revMb = revM * 1.40, netB = revMb - charges;
-  var roiB = invest > 0 ? (netB * 12 / invest) * 100 : 0;
-  var pbkB = netB > 0 ? invest / netB : Infinity;
-  return { nb:nb,invest:invest,revM:revM,charges:charges,net:net,roi:roi,pbk:pbk,pbkY:pbk/12,margin:margin,rent:val('rent'),cloc:val('cloc'),sal:val('sal'),kf:val('kfsub'),energy:val('energy'),insur:val('insur'),acct:val('acct'),mktg:val('mktg'),maint:val('maint'),misc:val('misc'),amortM:amortM,revMb:revMb,netB:netB,roiB:roiB,pbkB:pbkB,pbkYb:pbkB/12 };
+function mk(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h)e.innerHTML=h;return e;}
+function mRow(a,b){var r=mk('div','crow');r.innerHTML='<span class="cn">'+a+'</span><span>'+b+'</span>';return r;}
+function downloadPDF_stored(){var d=window._pdf;if(d)doPDF(d.r,d.name,d.q);}
+function doPDF(r,name,q){
+  try{
+    var doc=new window.jspdf.jsPDF(),y=20;
+    doc.setFontSize(20);doc.setFont('helvetica','bold');doc.text('Karafun Business',20,y);y+=8;
+    doc.setFontSize(11);doc.setFont('helvetica','normal');doc.setTextColor(120,94,167);doc.text('Rapport ROI - '+name,20,y);y+=6;
+    doc.setDrawColor(232,68,122);doc.setLineWidth(0.5);doc.line(20,y,190,y);y+=10;
+    doc.setTextColor(0,0,0);
+    ['ROI annuel : '+r.roi.toFixed(1)+'%','Investissement : '+fmt(r.invest),'CA mensuel : '+fmt(r.revM),'Charges : '+fmt(r.charges),'Net/mois : '+fmt(r.net),'Marge : '+r.margin.toFixed(1)+'%','CA avec boissons (+40%) : '+fmt(r.revMb),'Net avec boissons : '+fmt(r.netB),'Qualification : '+q].forEach(function(t){doc.text(t,20,y);y+=7;});
+    doc.setFontSize(9);doc.setTextColor(150,150,150);doc.text('business.karafun.com | 2025',20,285);
+    doc.save('karafun-roi.pdf');
+  }catch(e){alert('PDF: '+e.message);}
 }
-
-function isValidEmail(e) { var i = e.indexOf('@'); if (i < 1) return false; var d = e.substring(i+1); return d.indexOf('.')>0 && d.length>2; }
-
-function checkForm() {
-  var name = document.getElementById('lname').value.trim();
-  var email = document.getElementById('lemail').value.trim();
-  var phone = document.getElementById('lphone').value.trim();
-  var optin = document.getElementById('optin').checked;
-  var ok = true;
-  document.getElementById('e-name').style.display = name ? 'none' : 'block'; if (!name) ok = false;
-  document.getElementById('e-email').style.display = isValidEmail(email) ? 'none' : 'block'; if (!isValidEmail(email)) ok = false;
-  document.getElementById('e-phone').style.display = phone ? 'none' : 'block'; if (!phone) ok = false;
-  document.getElementById('e-optin').style.display = optin ? 'none' : 'block'; if (!optin) ok = false;
-  return ok;
+function showResults(r,name,email,mkt,analysis,q){
+  document.getElementById('loading').style.display='none';
+  var res=document.getElementById('res');res.innerHTML='';
+  var nc=r.net>=0?'pos':'neg',mc=r.margin>=0?'pos':'neg',fn=name.split(' ')[0];
+  var w=mk('div');w.style.padding='0 0 8px';
+  var top=mk('div');top.style.cssText='text-align:center;padding:20px 28px 8px';
+  var ti=mk('div');ti.style.cssText="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:8px";ti.textContent='Votre analyse, '+fn;
+  top.appendChild(ti);w.appendChild(top);
+  var b=mk('div');b.style.padding='0 28px';
+  var hero=mk('div','hero');hero.innerHTML='<div class="roi-lbl">Retour sur investissement annuel</div><div class="roi-num">'+r.roi.toFixed(1)+'%</div>';
+  var rs=mk('div','roi-sub');rs.innerHTML=r.nb+' box'+(r.nb>1?'es':'')+' &middot; '+fmt(r.invest)+(isFinite(r.pbk)&&r.pbk>0?'<br>Remboursement en <strong style="color:#5DE8A6">'+r.pbkY.toFixed(1)+' ans</strong>':'');
+  hero.appendChild(rs);b.appendChild(hero);
+  var mets=mk('div','mets');
+  [['CA mensuel','met-v acc',fmt(r.revM)],['Charges/mois','met-v',fmt(r.charges)],['Net/mois','met-v '+nc,fmt(r.net)],['Marge','met-v '+mc,r.margin.toFixed(1)+'%']].forEach(function(d){var m=mk('div','met');m.innerHTML='<div class="met-l">'+d[0]+'</div><div class="'+d[1]+'">'+d[2]+'</div>';mets.appendChild(m);});
+  b.appendChild(mets);
+  var bb=mk('div','boissonbox');
+  var bt=mk('div','boissonbox-t');bt.innerHTML='&#127865; Impact des boissons &amp; cocktails';
+  var btx=mk('div','boissonbox-b');btx.innerHTML='Le karaoke stimule la consommation de boissons. Les exploitants constatent en moyenne une <strong style="color:var(--accent)">augmentation de 40% du CA</strong> avec une activite boissons.';
+  var bm=mk('div','boisson-met');
+  [['CA avec boissons','acc',fmt(r.revMb)],['Net avec boissons',r.netB>=0?'pos':'neg',fmt(r.netB)],['ROI avec boissons','acc',r.roiB.toFixed(1)+'%']].forEach(function(d){var m=mk('div','met');m.style.cssText='background:rgba(232,68,122,0.06);border-color:rgba(232,68,122,0.2)';m.innerHTML='<div class="met-l">'+d[0]+'</div><div class="met-v '+d[1]+'">'+d[2]+'</div>';bm.appendChild(m);});
+  if(isFinite(r.pbkB)&&r.pbkB>0){var bp=mk('div','met');bp.style.cssText='background:rgba(232,68,122,0.06);border-color:rgba(232,68,122,0.2)';bp.innerHTML='<div class="met-l">Remboursement</div><div class="met-v pos">'+r.pbkYb.toFixed(1)+' ans</div>';bm.appendChild(bp);}
+  bb.appendChild(bt);bb.appendChild(btx);bb.appendChild(bm);b.appendChild(bb);
+  var sh=mk('div','sh');sh.textContent='Detail des charges';b.appendChild(sh);
+  var ct=mk('div','ctab');
+  [['Loyer et charges',fmt(r.rent+r.cloc)],['Masse salariale',fmt(r.sal)],['Abonnement Karafun',fmt(r.kf)],['Energie',fmt(r.energy)],['Assurance',fmt(r.insur)],['Comptabilite',fmt(r.acct)],['Marketing',fmt(r.mktg)],['Maintenance divers',fmt(r.maint+r.misc)],['Amortissement',fmt(r.amortM)]].forEach(function(d){ct.appendChild(mRow(d[0],d[1]));});
+  var tot=mk('div','crow tot');tot.innerHTML='<span>Total mensuel</span><span>'+fmt(r.charges)+'</span>';ct.appendChild(tot);b.appendChild(ct);
+  if(analysis){var ai=mk('div','aibox');ai.innerHTML='<div class="aibox-t">Analyse personnalisee</div><div class="aibox-b">'+analysis+'</div>';b.appendChild(ai);}
+  var pdfBtn=mk('button','btn');pdfBtn.style.cssText='margin-top:0;background:#1E1E26;border:1px solid rgba(232,68,122,0.4);color:var(--accent)';pdfBtn.textContent='Telecharger mon rapport PDF';pdfBtn.onclick=downloadPDF_stored;b.appendChild(pdfBtn);
+  var ea=mk('a');ea.href='https://meetings-eu1.hubspot.com/meetings/acaupert?uuid=e4041660-e0bf-43e9-9a08-b26ddd6ddaee';ea.target='_blank';ea.style.cssText='display:block;text-decoration:none';var eb=mk('button','btn');eb.style.marginTop='8px';eb.textContent='Parler a un expert Karafun';ea.appendChild(eb);b.appendChild(ea);
+  var ta=mk('a');ta.href='https://karaoke-box-thomann.vercel.app/';ta.target='_blank';ta.style.cssText='display:block;text-decoration:none;margin-top:8px';var td=mk('div','cta-acheter');td.innerHTML='&#127899;&#65039; Je suis convaincu, j&#39;achete le materiel !<span>Voir la selection d&#39;equipement karaoke &rarr;</span>';ta.appendChild(td);b.appendChild(ta);
+  var rb=mk('button','btn btn-g');rb.textContent='Nouvelle simulation';rb.onclick=function(){location.reload();};b.appendChild(rb);
+  w.appendChild(b);res.appendChild(w);
+  window._pdf={r:r,name:name,q:q};
 }
-
-function mk(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html) e.innerHTML = html; return e; }
-function mkA(href, cls, html) { var a = mk('a', cls, html); a.href = href; a.target = '_blank'; return a; }
-
-function downloadPDF(r,name,mkt,analysis,q) {
-  try {
-    var doc = new window.jspdf.jsPDF(); var y = 20;
-    doc.setFontSize(20); doc.setFont('helvetica','bold'); doc.text('Karafun Business',20,y); y+=8;
-    doc.setFontSize(12); doc.setFont('helvetica','normal'); doc.setTextColor(120,94,167); doc.text('Rapport Simulateur ROI',20,y); y+=6;
-    doc.setDrawColor(232,68,122); doc.setLineWidth(0.5); doc.line(20,y,190,y); y+=10;
-    doc.setTextColor(0,0,0); doc.setFontSize(11);
-    doc.text('Nom : '+name,20,y); y+=7; doc.text('Date : '+new Date().toLocaleDateString('fr-FR'),20,y); y+=7;
-    if(mkt&&mkt.city){doc.text('Ville : '+mkt.city,20,y); y+=7;}
-    doc.text('Qualification : '+q,20,y); y+=12;
-    doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.text('Resultats ROI',20,y); y+=8;
-    doc.setFont('helvetica','normal'); doc.setFontSize(11);
-    doc.text('ROI annuel : '+r.roi.toFixed(1)+'%',20,y); y+=7;
-    doc.text('Investissement : '+fmt(r.invest),20,y); y+=7;
-    doc.text('CA mensuel : '+fmt(r.revM),20,y); y+=7;
-    doc.text('Charges : '+fmt(r.charges),20,y); y+=7;
-    doc.text('Resultat net : '+fmt(r.net),20,y); y+=7;
-    doc.text('Marge : '+r.margin.toFixed(1)+'%',20,y); y+=7;
-    if(isFinite(r.pbk)&&r.pbk>0){doc.text('Remboursement : '+r.pbkY.toFixed(1)+' ans',20,y); y+=7;}
-    y+=4; doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(232,68,122);
-    doc.text('Simulation avec boissons (+40%) :',20,y); y+=7;
-    doc.setTextColor(0,0,0); doc.setFont('helvetica','normal'); doc.setFontSize(11);
-    doc.text('CA avec boissons : '+fmt(r.revMb),20,y); y+=7;
-    doc.text('Net avec boissons : '+fmt(r.netB),20,y); y+=7;
-    doc.text('ROI avec boissons : '+r.roiB.toFixed(1)+'%',20,y); y+=7;
-    y+=5; doc.setDrawColor(200,200,200); doc.line(20,y,190,y); y+=8;
-    doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(0,0,0); doc.text('Charges mensuelles',20,y); y+=8;
-    doc.setFont('helvetica','normal'); doc.setFontSize(11);
-    ['Loyer+charges:'+fmt(r.rent+r.cloc),'Salaires:'+fmt(r.sal),'Karafun:'+fmt(r.kf),'Energie:'+fmt(r.energy),'Assurance:'+fmt(r.insur),'Compta:'+fmt(r.acct),'Marketing:'+fmt(r.mktg),'Maintenance:'+fmt(r.maint+r.misc),'Amortissement:'+fmt(r.amortM),'TOTAL:'+fmt(r.charges)].forEach(function(t){doc.text(t,20,y);y+=7;});
-    if(analysis){if(y>230){doc.addPage();y=20;} doc.setFont('helvetica','bold');doc.setFontSize(13);doc.text('Analyse personnalisee',20,y);y+=8;doc.setFont('helvetica','normal');doc.setFontSize(10);doc.text(doc.splitTextToSize(analysis,170),20,y);}
-    doc.setFontSize(9); doc.setTextColor(150,150,150); doc.text('business.karafun.com | Karafun Business 2025',20,285);
-    doc.save('karafun-rapport-roi.pdf');
-  } catch(e) { alert('Erreur PDF: '+e.message); }
-}
-function downloadPDF_stored(){var d=window._pdfData;if(d)downloadPDF(d.r,d.name,d.mkt,d.analysis,d.q);}
-
-function showResults(r,name,email,mkt,analysis,q) {
-  document.getElementById('loading').style.display = 'none';
-  var res = document.getElementById('res');
-  res.innerHTML = '';
-
-  var nc = r.net >= 0 ? 'pos' : 'neg';
-  var mc = r.margin >= 0 ? 'pos' : 'neg';
-  var fn = name.split(' ')[0];
-  var qColor = q === 'Lead chaud' ? '#5DE8A6' : q === 'Lead tiede' ? '#FFD166' : '#FF6B6B';
-  var qLabel = q === 'Lead chaud' ? 'Projet tres prometteur' : q === 'Lead tiede' ? 'Projet a potentiel' : 'Projet a consolider';
-
-  var wrap = mk('div'); wrap.style.padding = '0 0 8px';
-
-  var top = mk('div'); top.style.cssText = 'text-align:center;padding:20px 28px 8px';
-  var okico = mk('div','okico'); okico.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#5DE8A6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  var title = mk('div'); title.style.cssText = 'font-family:Playfair Display,serif;font-size:19px;font-weight:700;margin-bottom:8px';
-  title.textContent = 'Analyse prete, ' + fn + ' !';
-  var badge = mk('div'); badge.style.cssText = 'display:inline-block;background:'+qColor+'22;border:1px solid '+qColor+'55;border-radius:20px;padding:4px 14px;font-size:11px;font-weight:600;color:'+qColor+';margin-bottom:4px';
-  badge.textContent = qLabel;
-  top.appendChild(okico); top.appendChild(title); top.appendChild(badge);
-  wrap.appendChild(top);
-
-  var body = mk('div'); body.style.padding = '0 28px';
-
-  var hero = mk('div','hero');
-  hero.innerHTML = '<div class="roi-lbl">Retour sur investissement annuel</div><div class="roi-num">'+r.roi.toFixed(1)+'%</div>';
-  var roiSub = mk('div','roi-sub');
-  roiSub.innerHTML = r.nb + ' box' + (r.nb>1?'es':'') + ' &middot; ' + fmt(r.invest) + (isFinite(r.pbk)&&r.pbk>0 ? '<br>Remboursement en <strong style="color:#5DE8A6">'+r.pbkY.toFixed(1)+' ans</strong>' : '');
-  hero.appendChild(roiSub);
-  body.appendChild(hero);
-
-  var mets = mk('div','mets');
-  [['CA mensuel','met-v acc',fmt(r.revM)],['Charges/mois','met-v',fmt(r.charges)],['Net/mois','met-v '+nc,fmt(r.net)],['Marge nette','met-v '+mc,r.margin.toFixed(1)+'%']].forEach(function(d){
-    var m = mk('div','met'); m.innerHTML = '<div class="met-l">'+d[0]+'</div><div class="'+d[1]+'">'+d[2]+'</div>'; mets.appendChild(m);
-  });
-  body.appendChild(mets);
-
-  var bBox = mk('div','boissonbox');
-  var bTitle = mk('div','boissonbox-t'); bTitle.innerHTML = '&#127865; Impact des boissons &amp; cocktails';
-  var bText = mk('div','boissonbox-b'); bText.innerHTML = 'Le karaoke stimule la consommation de boissons. Les exploitants constatent en moyenne une <strong style="color:var(--accent)">augmentation de 40% du CA</strong> avec une activite boissons.';
-  var bMets = mk('div','boisson-met');
-  [['CA avec boissons','acc',fmt(r.revMb)],['Net avec boissons',r.netB>=0?'pos':'neg',fmt(r.netB)],['ROI avec boissons','acc',r.roiB.toFixed(1)+'%'],(isFinite(r.pbkB)&&r.pbkB>0?['Remboursement','pos',r.pbkYb.toFixed(1)+' ans']:null)].filter(Boolean).forEach(function(d){
-    var m = mk('div','met'); m.style.cssText='background:rgba(232,68,122,0.06);border-color:rgba(232,68,122,0.2)';
-    m.innerHTML='<div class="met-l">'+d[0]+'</div><div class="met-v '+d[1]+'">'+d[2]+'</div>'; bMets.appendChild(m);
-  });
-  bBox.appendChild(bTitle); bBox.appendChild(bText); bBox.appendChild(bMets);
-  body.appendChild(bBox);
-
-  var shCharges = mk('div','sh'); shCharges.textContent = 'Detail des charges'; body.appendChild(shCharges);
-  var ctab = mk('div','ctab');
-  [['Loyer et charges',fmt(r.rent+r.cloc)],['Masse salariale',fmt(r.sal)],['Abonnement Karafun',fmt(r.kf)],['Energie',fmt(r.energy)],['Assurance',fmt(r.insur)],['Comptabilite',fmt(r.acct)],['Marketing',fmt(r.mktg)],['Maintenance et divers',fmt(r.maint+r.misc)],['Amortissement',fmt(r.amortM)]].forEach(function(d){
-    var row = mk('div','crow'); row.innerHTML='<span class="cn">'+d[0]+'</span><span>'+d[1]+'</span>'; ctab.appendChild(row);
-  });
-  var tot = mk('div','crow tot'); tot.innerHTML='<span>Total mensuel</span><span>'+fmt(r.charges)+'</span>'; ctab.appendChild(tot);
-  body.appendChild(ctab);
-
-  if (mkt && mkt.potential) {
-    var shMkt = mk('div','sh'); shMkt.style.marginTop='0'; shMkt.textContent='Analyse du marche local'; body.appendChild(shMkt);
-    var mktBox = mk('div','mktbox');
-    [['Ville analysee',mkt.city],['Potentiel de la zone',mkt.potential],(mkt.pop?['Population',Math.round(mkt.pop/1000)+' 000 hab.']:null)].filter(Boolean).forEach(function(d){
-      var row = mk('div','mktrow'); row.innerHTML='<span class="cn">'+d[0]+'</span><span style="font-weight:500">'+d[1]+'</span>'; mktBox.appendChild(row);
-    });
-    body.appendChild(mktBox);
-  }
-
-  if (analysis) {
-    var aiBox = mk('div','aibox');
-    aiBox.innerHTML = '<div class="aibox-t">Analyse personnalisee Karafun Business</div><div class="aibox-b">'+analysis+'</div>';
-    body.appendChild(aiBox);
-  }
-
-  var pdfBtn = mk('button','btn'); pdfBtn.style.cssText='margin-top:0;background:#1E1E26;border:1px solid rgba(232,68,122,0.4);color:var(--accent)';
-  pdfBtn.textContent='Telecharger mon rapport PDF'; pdfBtn.onclick=downloadPDF_stored; body.appendChild(pdfBtn);
-
-  var expertA = mk('a'); expertA.href='https://meetings-eu1.hubspot.com/meetings/acaupert?uuid=e4041660-e0bf-43e9-9a08-b26ddd6ddaee'; expertA.target='_blank'; expertA.style.cssText='display:block;text-decoration:none';
-  var expertBtn = mk('button','btn'); expertBtn.style.marginTop='8px'; expertBtn.textContent='Parler a un expert Karafun'; expertA.appendChild(expertBtn); body.appendChild(expertA);
-
-  var thomannA = mk('a'); thomannA.href='https://karaoke-box-thomann.vercel.app/'; thomannA.target='_blank'; thomannA.style.cssText='display:block;text-decoration:none;margin-top:8px';
-  var ctaBtn = mk('div','cta-acheter'); ctaBtn.innerHTML='&#127899;&#65039; Je suis convaincu, j&#39;achete le materiel !<span>Voir la selection d&#39;equipement karaoke &rarr;</span>'; thomannA.appendChild(ctaBtn); body.appendChild(thomannA);
-
-  var reloadBtn = mk('button','btn btn-g'); reloadBtn.textContent='Nouvelle simulation'; reloadBtn.onclick=fasync function doSubmit(){
+async function doSubmit(){
   var firstname=document.getElementById('lfirstname').value.trim();
   var lastname=document.getElementById('llastname').value.trim();
   var name=firstname+' '+lastname;
@@ -401,7 +291,7 @@ function showResults(r,name,email,mkt,analysis,q) {
   var eF=document.getElementById('e-firstname'),eLN=document.getElementById('e-lastname'),eE=document.getElementById('e-email'),eT=document.getElementById('e-phone'),eO=document.getElementById('e-optin');
   if(eF)eF.style.display=firstname?'none':'block';if(!firstname)ok=false;
   if(eLN)eLN.style.display=lastname?'none':'block';if(!lastname)ok=false;
-  if(eE)eE.style.display=(email&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))?'none':'block';if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))ok=false;
+  if(eE)eE.style.display=(email&&/^[^s@]+@[^s@]+.[^s@]+$/.test(email))?'none':'block';if(!email||!/^[^s@]+@[^s@]+.[^s@]+$/.test(email))ok=false;
   if(eT)eT.style.display=phone?'none':'block';if(!phone)ok=false;
   if(eO)eO.style.display=optin?'none':'block';if(!optin)ok=false;
   if(!ok)return;
@@ -423,10 +313,6 @@ function showResults(r,name,email,mkt,analysis,q) {
   }catch(e){}
   document.getElementById('load-msg').textContent='Enregistrement du lead...';
   fetch('/api/hubspot',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({firstname:firstname,lastname:lastname,email:email,phone:phone,city:city||'',stage:stage,roi:r.roi,revM:r.revM,net:r.net,invest:r.invest,pbkY:r.pbkY||0,pbk:r.pbk||0,nb:r.nb,qualification:q})}).catch(function(e){console.warn('HS:',e);});
-  showResults(r,name,email,mkt,analysis,q);
-}ication',q);fd.append('_replyto',email);
-    await fetch('https://formspree.io/f/'+FORMSPREE_ID,{method:'POST',body:fd});
-  } catch(e){}
   showResults(r,name,email,mkt,analysis,q);
 }
 </script>
