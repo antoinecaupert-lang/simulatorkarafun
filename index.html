@@ -160,7 +160,8 @@ footer a{color:rgba(232,68,122,.5);text-decoration:none}
     <div class="ttl">Recevez votre analyse</div><div class="sub">Votre rapport ROI sera envoye par email</div>
     <div class="lcard"><div class="lcard-t">Votre simulation est prete</div><div class="lcard-b">Renseignez vos coordonnees pour recevoir votre rapport complet. Un expert Karafun Business sera disponible pour vous accompagner.</div></div>
     <div class="g1">
-      <div class="f"><label class="lbl">Prenom et Nom</label><input type="text" id="lname" placeholder="Jean Dupont"><span class="err" id="e-name">Veuillez renseigner votre nom</span></div>
+      <div class="f"><label class="lbl">Prenom</label><input type="text" id="lfirstname" placeholder="Jean"><span class="err" id="e-firstname">Veuillez renseigner votre prenom</span></div>
+      <div class="f"><label class="lbl">Nom</label><input type="text" id="llastname" placeholder="Dupont"><span class="err" id="e-lastname">Veuillez renseigner votre nom</span></div>
       <div class="f"><label class="lbl">Email</label><input type="email" id="lemail" placeholder="jean@exemple.fr"><span class="err" id="e-email">Email invalide</span></div>
       <div class="f"><label class="lbl">Telephone</label><input type="tel" id="lphone" placeholder="+33 6 12 34 56 78"><span class="err" id="e-phone">Telephone requis</span></div>
       <div class="f"><label class="lbl">Stade du projet</label><select id="lstage"><option value="etude">En phase d etude</option><option value="local">Recherche de local</option><option value="financement">Recherche de financement</option><option value="ouverture">Ouverture dans 6 mois</option><option value="existant">Etablissement existant</option></select></div>
@@ -386,43 +387,44 @@ function showResults(r,name,email,mkt,analysis,q) {
   var thomannA = mk('a'); thomannA.href='https://karaoke-box-thomann.vercel.app/'; thomannA.target='_blank'; thomannA.style.cssText='display:block;text-decoration:none;margin-top:8px';
   var ctaBtn = mk('div','cta-acheter'); ctaBtn.innerHTML='&#127899;&#65039; Je suis convaincu, j&#39;achete le materiel !<span>Voir la selection d&#39;equipement karaoke &rarr;</span>'; thomannA.appendChild(ctaBtn); body.appendChild(thomannA);
 
-  var reloadBtn = mk('button','btn btn-g'); reloadBtn.textContent='Nouvelle simulation'; reloadBtn.onclick=function(){location.reload();}; body.appendChild(reloadBtn);
-
-  wrap.appendChild(body);
-  res.appendChild(wrap);
-  window._pdfData = {r:r,name:name,mkt:mkt,analysis:analysis,q:q};
-}
-
-async function doSubmit() {
-  if (!checkForm()) return;
+  var reloadBtn = mk('button','btn btn-g'); reloadBtn.textContent='Nouvelle simulation'; reloadBtn.onclick=fasync function doSubmit(){
+  var firstname=document.getElementById('lfirstname').value.trim();
+  var lastname=document.getElementById('llastname').value.trim();
+  var name=firstname+' '+lastname;
+  var email=document.getElementById('lemail').value.trim();
+  var phone=document.getElementById('lphone').value.trim();
+  var lstageEl=document.getElementById('lstage');
+  var stage=lstageEl?lstageEl.options[lstageEl.selectedIndex].text:'';
+  var city=document.getElementById('city')?document.getElementById('city').value.trim():'';
+  var optin=document.getElementById('optin').checked;
+  var ok=true;
+  var eF=document.getElementById('e-firstname'),eLN=document.getElementById('e-lastname'),eE=document.getElementById('e-email'),eT=document.getElementById('e-phone'),eO=document.getElementById('e-optin');
+  if(eF)eF.style.display=firstname?'none':'block';if(!firstname)ok=false;
+  if(eLN)eLN.style.display=lastname?'none':'block';if(!lastname)ok=false;
+  if(eE)eE.style.display=(email&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))?'none':'block';if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))ok=false;
+  if(eT)eT.style.display=phone?'none':'block';if(!phone)ok=false;
+  if(eO)eO.style.display=optin?'none':'block';if(!optin)ok=false;
+  if(!ok)return;
+  var r=calc();
+  var mkt=window._mktData||null;
+  var mktScore=mkt&&mkt.score?mkt.score:50;
+  var sScore={'En phase d etude':1,'Recherche de local':2,'Recherche de financement':2,'Ouverture dans 6 mois':3,'Etablissement existant':3}[stage]||1;
+  var q=(r.roi>=20&&sScore>=2&&mktScore>=70)?'Lead chaud':(r.roi>=10&&(sScore>=2||mktScore>=60))?'Lead tiede':'Lead froid';
   go(4);
-  var r = calc();
-  var name = document.getElementById('lname').value.trim();
-  var email = document.getElementById('lemail').value.trim();
-  var phone = document.getElementById('lphone').value.trim();
-  var stageEl = document.getElementById('lstage');
-  var stage = stageEl.options[stageEl.selectedIndex].text;
-  var city = document.getElementById('city').value.trim();
-  document.getElementById('load-msg').textContent = 'Analyse du marche local...';
-  var mkt = null;
-  if (city) { try { var mr=await fetch('/api/places',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({city:city})}); var md=await mr.json(); if(md&&md.potential)mkt=md; } catch(e){} }
-  document.getElementById('load-msg').textContent = 'Generation de l analyse IA...';
-  var ctx = mkt ? '
-- Ville : '+mkt.city+'
-- Potentiel : '+mkt.potential : '';
-  var prompt = 'Expert karaoke Karafun Business. Analyse 4-5 paragraphes francais pour '+name+', '+r.nb+' boxes. Invest:'+fmt(r.invest)+' CA:'+fmt(r.revM)+' Net:'+fmt(r.net)+' ROI:'+r.roi.toFixed(1)+'% Stade:'+stage+ctx+'. Ton pro et chaleureux, pas de liste.';
-  var analysis = null;
-  try { var ar=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:prompt})}); var ad=await ar.json(); if(ad&&ad.analysis)analysis=ad.analysis; } catch(e){}
-  document.getElementById('load-msg').textContent = 'Envoi du rapport...';
-  var mktScore = mkt&&mkt.score?mkt.score:50;
-  var sc = ({'etude':1,'local':2,'financement':2,'ouverture':3,'existant':3})[stageEl.value]||1;
-  var q = (r.roi>=20&&sc>=2&&mktScore>=70)?'Lead chaud':(r.roi>=10&&(sc>=2||mktScore>=60))?'Lead tiede':'Lead froid';
-  try {
-    var fd = new FormData();
-    fd.append('nom',name);fd.append('email',email);fd.append('telephone',phone);fd.append('stade',stage);
-    fd.append('ville',city||'Non renseignee');fd.append('nb_boxes',r.nb);fd.append('roi_annuel',r.roi.toFixed(1)+'%');
-    fd.append('ca_mensuel',fmt(r.revM));fd.append('resultat_net',fmt(r.net));fd.append('investissement',fmt(r.invest));
-    fd.append('charges',fmt(r.charges));fd.append('qualification',q);fd.append('_replyto',email);
+  document.getElementById('load-msg').textContent='Analyse en cours...';
+  var ctx=city?'\n- Ville : '+city:'';
+  var prompt='Genere une analyse personnalisee courte (4-5 paragraphes) en francais pour '+name+', porteur d un projet de '+r.nb+' box(es) karaoke.\n\nDonnees :\n- Investissement : '+fmt(r.invest)+'\n- CA mensuel : '+fmt(r.revM)+'\n- Charges : '+fmt(r.charges)+'\n- Resultat net/mois : '+fmt(r.net)+'\n- ROI annuel : '+r.roi.toFixed(1)+'%\n- Retour invest. : '+(isFinite(r.pbk)&&r.pbk>0?r.pbkY.toFixed(1)+' ans':'modele a revoir')+'\n- Stade : '+stage+ctx+'\n\nTon : professionnel, chaleureux, direct. Pas de liste a puces. Uniquement du texte.';
+  var analysis=null;
+  try{
+    var _ac=new AbortController();var _tid=setTimeout(function(){_ac.abort();},5000);
+    var aiRes=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:prompt}),signal:_ac.signal});
+    clearTimeout(_tid);
+    if(aiRes.ok){var aiData=await aiRes.json();if(aiData&&aiData.analysis)analysis=aiData.analysis;}
+  }catch(e){}
+  document.getElementById('load-msg').textContent='Enregistrement du lead...';
+  fetch('/api/hubspot',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({firstname:firstname,lastname:lastname,email:email,phone:phone,city:city||'',stage:stage,roi:r.roi,revM:r.revM,net:r.net,invest:r.invest,pbkY:r.pbkY||0,pbk:r.pbk||0,nb:r.nb,qualification:q})}).catch(function(e){console.warn('HS:',e);});
+  showResults(r,name,email,mkt,analysis,q);
+}ication',q);fd.append('_replyto',email);
     await fetch('https://formspree.io/f/'+FORMSPREE_ID,{method:'POST',body:fd});
   } catch(e){}
   showResults(r,name,email,mkt,analysis,q);
